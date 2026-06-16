@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Refine by Charlotte">
+<title>Refine by Charlotte — Korean Lash Lift Form</title>
+
+<!-- jsPDF for PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" async defer onerror="console.log('jsPDF not loaded')"></script>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --brand: #4A3728;
+  --brand-light: #6B5344;
+  --brand-lighter: #8B7366;
+  --cream: #FAF7F4;
+  --cream-dark: #F0EBE6;
+  --warm-white: #FDFCFB;
+  --text: #2C1E14;
+  --text-light: #7A6B60;
+  --text-muted: #A89888;
+  --accent: #C4956A;
+  --accent-light: #E8D5C0;
+  --success: #5A8A6A;
+  --success-light: #E8F2EC;
+  --error: #B85450;
+  --error-light: #FCEEED;
+  --border: #E0D8D0;
+  --shadow: rgba(74, 55, 40, 0.08);
+  --shadow-md: rgba(74, 55, 40, 0.12);
+  --radius: 12px;
+  --radius-lg: 20px;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ SPLASH SCREEN ═══ */
+.splash {
+  position: fixed; inset: 0; z-index: 1000;
+  background: var(--brand);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.splash.fade-out { opacity: 0; transform: scale(1.05); pointer-events: none; }
+.splash-logo {
+  width: 120px; height: 120px;
+  background: var(--warm-white);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  animation: splashPulse 2s ease-in-out infinite;
+}
+.splash-logo span {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px; font-weight: 300;
+  color: var(--brand); letter-spacing: 1px;
+}
+.splash-subtitle {
+  margin-top: 20px; color: var(--accent-light);
+  font-size: 13px; letter-spacing: 3px; text-transform: uppercase;
+  font-weight: 300;
+}
+@keyframes splashPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+/* ═══ APP SHELL ═══ */
+.app {
+  display: none; flex-direction: column;
+  min-height: 100vh; min-height: 100dvh;
+}
+.app.visible { display: flex; }
+
+/* ═══ HEADER ═══ */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(250, 247, 244, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.header-logo {
+  display: flex; align-items: center; gap: 12px;
+}
+.header-logo-circle {
+  width: 44px; height: 44px;
+  background: var(--brand);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.header-logo-circle span {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px; font-weight: 300;
+  color: var(--warm-white); letter-spacing: 0.5px;
+}
+.header-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 400; color: var(--brand);
+}
+.header-actions { display: flex; gap: 8px; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px;
+  border: none; border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: all var(--transition);
+  white-space: nowrap;
+}
+.btn-primary {
+  background: var(--brand); color: white;
+  box-shadow: 0 2px 8px var(--shadow-md);
+}
+.btn-primary:hover { background: var(--brand-light); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.btn-secondary {
+  background: var(--warm-white); color: var(--brand);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { background: var(--cream-dark); }
+.btn-icon {
+  width: 44px; height: 44px; padding: 0;
+  border-radius: 50%; justify-content: center;
+}
+.btn-success { background: var(--success); color: white; }
+.btn-success:hover { background: #4A7A5A; }
+
+/* ═══ PROGRESS BAR ═══ */
+.progress-bar {
+  background: var(--cream-dark);
+  height: 4px; width: 100%;
+}
+.progress-fill {
+  height: 100%; background: var(--accent);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 0 2px 2px 0;
+}
+
+/* ═══ STEP INDICATORS ═══ */
+.steps-nav {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 20px 24px 0;
+}
+.step-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: all var(--transition);
+  cursor: pointer;
+}
+.step-dot.active { background: var(--brand); width: 28px; border-radius: 5px; }
+.step-dot.completed { background: var(--success); }
+.step-label {
+  font-size: 12px; color: var(--text-muted);
+  text-align: center; margin-top: 12px;
+  font-weight: 500; letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ═══ MAIN CONTENT ═══ */
+.main {
+  flex: 1; padding: 20px 24px 120px;
+  max-width: 800px; margin: 0 auto; width: 100%;
+}
+
+/* ═══ FORM SECTIONS ═══ */
+.form-section {
+  display: none;
+  animation: fadeSlideIn 0.5s ease forwards;
+}
+.form-section.active { display: block; }
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section-header { margin-bottom: 28px; }
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 32px; font-weight: 400;
+  color: var(--brand); line-height: 1.2;
+}
+.section-subtitle {
+  font-size: 14px; color: var(--text-light);
+  margin-top: 8px; line-height: 1.5;
+}
+
+/* ═══ FORM CARD ═══ */
+.form-card {
+  background: var(--warm-white);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 4px var(--shadow);
+  transition: all var(--transition);
+}
+.form-card:hover { box-shadow: 0 4px 16px var(--shadow-md); }
+
+.card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px; font-weight: 500;
+  color: var(--brand); margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--cream-dark);
+}
+
+/* ═══ TOGGLE GRID (Yes/No) ═══ */
+.toggle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+@media (max-width: 600px) {
+  .toggle-grid { grid-template-columns: 1fr; }
+}
+
+.toggle-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--cream);
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  transition: all var(--transition);
+  cursor: pointer;
+  -webkit-user-select: none; user-select: none;
+}
+.toggle-item:active { transform: scale(0.98); }
+.toggle-item.yes {
+  background: var(--error-light);
+  border-color: var(--error);
+}
+
+.toggle-label {
+  font-size: 13px; font-weight: 400;
+  color: var(--text); flex: 1;
+  line-height: 1.3;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 52px; height: 28px;
+  flex-shrink: 0; margin-left: 12px;
+}
+.toggle-switch input { display: none; }
+.toggle-track {
+  position: absolute; inset: 0;
+  background: var(--border);
+  border-radius: 14px;
+  transition: background var(--transition);
+}
+.toggle-switch input:checked + .toggle-track {
+  background: var(--error);
+}
+.toggle-thumb {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 22px; height: 22px;
+  background: white;
+  border-radius: 50%;
+  transition: transform var(--transition);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.toggle-switch input:checked ~ .toggle-thumb {
+  transform: translateX(24px);
+}
+
+/* ═══ INPUT FIELDS ═══ */
+.field-group { margin-bottom: 18px; }
+.field-label {
+  display: block;
+  font-size: 12px; font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.field-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: var(--text);
+  background: var(--cream);
+  transition: all var(--transition);
+  -webkit-appearance: none;
+}
+.field-input:focus {
+  outline: none;
+  border-color: var(--brand);
+  background: var(--warm-white);
+  box-shadow: 0 0 0 3px rgba(74, 55, 40, 0.1);
+}
+.field-input::placeholder { color: var(--text-muted); }
+
+select.field-input {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%237A6B60'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+textarea.field-input {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.field-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+/* ═══ RADIO GROUP ═══ */
+.radio-group {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.radio-option {
+  padding: 12px 24px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: all var(--transition);
+  background: var(--cream);
+  -webkit-user-select: none; user-select: none;
+}
+.radio-option:active { transform: scale(0.97); }
+.radio-option.selected {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: white;
+}
+.radio-option input { display: none; }
+
+/* ═══ CONSENT CHECKBOXES ═══ */
+.consent-item {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 16px;
+  background: var(--cream);
+  border-radius: var(--radius);
+  border: 1.5px solid transparent;
+  transition: all var(--transition);
+  cursor: pointer;
+  -webkit-user-select: none; user-select: none;
+  margin-bottom: 10px;
+}
+.consent-item:active { transform: scale(0.99); }
+.consent-item.checked {
+  background: var(--success-light);
+  border-color: var(--success);
+}
+.consent-check {
+  width: 24px; height: 24px; flex-shrink: 0;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition);
+  margin-top: 1px;
+}
+.consent-item.checked .consent-check {
+  background: var(--success);
+  border-color: var(--success);
+}
+.consent-check svg { opacity: 0; transition: opacity 0.2s; }
+.consent-item.checked .consent-check svg { opacity: 1; }
+.consent-text {
+  font-size: 13px; line-height: 1.6;
+  color: var(--text);
+}
+.consent-item input { display: none; }
+
+/* ═══ SIGNATURE PAD ═══ */
+.signature-area { margin-top: 20px; }
+.signature-pad-wrapper {
+  position: relative;
+  background: white;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  touch-action: none;
+}
+.signature-pad-wrapper.has-signature {
+  border-style: solid;
+  border-color: var(--success);
+}
+.signature-canvas {
+  width: 100%; height: 180px;
+  display: block;
+  cursor: crosshair;
+}
+.signature-placeholder {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px; color: var(--text-muted);
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.signature-pad-wrapper.has-signature .signature-placeholder { opacity: 0; }
+.signature-clear {
+  position: absolute; top: 8px; right: 8px;
+  background: var(--cream); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 12px;
+  font-size: 12px; color: var(--text-light);
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+}
+.signature-line {
+  position: absolute; bottom: 40px;
+  left: 24px; right: 24px;
+  height: 1px; background: var(--border);
+  pointer-events: none;
+}
+
+/* ═══ BOTTOM NAV ═══ */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(250, 247, 244, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  padding: 16px 24px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  display: flex; justify-content: space-between; align-items: center;
+  z-index: 100;
+}
+
+/* ═══ MODAL ═══ */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(44, 30, 20, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: none; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.modal-overlay.visible { display: flex; }
+.modal {
+  background: var(--warm-white);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+  max-width: 440px; width: 100%;
+  box-shadow: 0 20px 60px rgba(44, 30, 20, 0.25);
+  text-align: center;
+  animation: modalIn 0.4s ease;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-icon {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+}
+.modal-icon.success { background: var(--success-light); }
+.modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px; font-weight: 500;
+  color: var(--brand); margin-bottom: 8px;
+}
+.modal-text { font-size: 14px; color: var(--text-light); line-height: 1.5; margin-bottom: 24px; }
+.modal-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* ═══ TOAST ═══ */
+.toast {
+  position: fixed; top: 24px; right: 24px; z-index: 300;
+  background: var(--brand);
+  color: white; padding: 14px 22px;
+  border-radius: var(--radius);
+  font-size: 14px; font-weight: 500;
+  box-shadow: 0 8px 24px var(--shadow-md);
+  transform: translateY(-100px);
+  opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.toast.visible { transform: translateY(0); opacity: 1; }
+.toast.error { background: var(--error); }
+.toast.success { background: var(--success); }
+
+/* ═══ SPINNER ═══ */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2.5px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ═══ GDPR TEXT ═══ */
+.gdpr-text {
+  font-size: 12px;
+  color: var(--text-light);
+  line-height: 1.7;
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media (min-width: 1024px) {
+  .main { max-width: 860px; padding: 32px 40px 120px; }
+  .toggle-grid { grid-template-columns: 1fr 1fr 1fr; }
+}
+@media (max-width: 500px) {
+  .field-row, .field-row-3 { grid-template-columns: 1fr; }
+}
+
+/* ═══ PRINT ═══ */
+@media print {
+  .header, .bottom-nav, .steps-nav, .progress-bar, .btn { display: none !important; }
+  .form-section { display: block !important; page-break-after: always; }
+  .main { max-width: 100%; padding: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ SPLASH ═══ -->
+<div class="splash" id="splash">
+  <div class="splash-logo"><span>refine.</span></div>
+  <div class="splash-subtitle">by Charlotte</div>
+</div>
+
+<!-- ═══ TOAST ═══ -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══ APP ═══ -->
+<div class="app" id="app">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-logo">
+      <div class="header-logo-circle"><span>r.</span></div>
+      <span class="header-title">Korean Lash Lift</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary btn-icon" onclick="resetAll()" title="New Client">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v10M7 10h10"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Progress -->
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 33%"></div></div>
+
+  <!-- Step Dots -->
+  <div class="steps-nav">
+    <div class="step-dot active" data-step="1" onclick="goToStep(1)"></div>
+    <div class="step-dot" data-step="2" onclick="goToStep(2)"></div>
+    <div class="step-dot" data-step="3" onclick="goToStep(3)"></div>
+  </div>
+  <div class="step-label" id="stepLabel">Personal Details</div>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <!-- ═══════════ STEP 1: PERSONAL DETAILS ═══════════ -->
+    <div class="form-section active" id="step1">
+      <div class="section-header">
+        <h1 class="section-title">Treatment Consultation</h1>
+        <p class="section-subtitle">Korean Lash Lift — Please complete all sections.</p>
+      </div>
+
+      <div class="form-card">
+        <div class="card-title">Personal Details</div>
+        <div class="field-group">
+          <label class="field-label">Full Name</label>
+          <input type="text" class="field-input" id="clientName" placeholder="Enter full name" autocomplete="name">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Address</label>
+          <input type="text" class="field-input" id="clientAddress" placeholder="Full address">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Date of Birth</label>
+          <div class="field-row-3">
+            <select class="field-input" id="dobDay"></select>
+            <select class="field-input" id="dobMonth"></select>
+            <select class="field-input" id="dobYear"></select>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Contact Number</label>
+          <input type="tel" class="field-input" id="clientPhone" placeholder="Phone number" autocomplete="tel">
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ STEP 2: MEDICAL CHECKLIST ═══════════ -->
+    <div class="form-section" id="step2">
+      <div class="section-header">
+        <h1 class="section-title">Health &amp; Conditions</h1>
+        <p class="section-subtitle">Do you have any of the following? Please toggle any that apply.</p>
+      </div>
+
+      <div class="form-card">
+        <div class="card-title">Medical Conditions</div>
+        <div class="toggle-grid" id="conditionsGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="card-title">Details &amp; Medications</div>
+        <p style="font-size:13px;color:var(--text-light);margin-bottom:16px;line-height:1.6">
+          This list is not exhaustive — please inform the therapist if there is anything else. Give details of any of the above, and list any medications. If none, write N/A.
+        </p>
+        <div class="field-group">
+          <label class="field-label">Please give details &amp; list any medications</label>
+          <textarea class="field-input" id="medDetails" placeholder="If none, write N/A"></textarea>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="card-title">Retinol Use</div>
+        <div class="field-group">
+          <label class="field-label">Are you using Retinol on your face (in your skincare)?</label>
+          <div class="radio-group" id="retinolRadio">
+            <div class="radio-option" onclick="selectRadio(this, 'retinol', 'Yes')">
+              <input type="radio" name="retinol" value="Yes"> Yes
+            </div>
+            <div class="radio-option" onclick="selectRadio(this, 'retinol', 'No')">
+              <input type="radio" name="retinol" value="No"> No
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ STEP 3: DECLARATION, CONSENT & GDPR ═══════════ -->
+    <div class="form-section" id="step3">
+      <div class="section-header">
+        <h1 class="section-title">Declaration &amp; Consent</h1>
+        <p class="section-subtitle">Please read carefully before signing.</p>
+      </div>
+
+      <!-- Declaration -->
+      <div class="form-card">
+        <div class="card-title">Client Declaration</div>
+        <div class="consent-item" onclick="toggleConsent(this)">
+          <div class="consent-check">
+            <svg width="14" height="14" fill="none" stroke="white" stroke-width="2.5"><polyline points="2,7 6,11 12,3"/></svg>
+          </div>
+          <span class="consent-text">I confirm a patch test has been performed (if required) with no adverse reaction, and the information above is correct to my knowledge. I am not aware of any reasons why the treatment should not be performed. I am aware that even though a patch test has been carried out, reactions can occur/develop at any time and this is not a guarantee that a reaction will never take place. I therefore release my technician/trainer of any responsibility in the event a reaction does occur. I agree to follow the aftercare I have been given.</span>
+          <input type="checkbox" name="declaration">
+        </div>
+
+        <div style="margin-top:20px">
+          <div class="signature-area">
+            <label class="field-label">Client Signature</label>
+            <div class="signature-pad-wrapper" id="sig1Wrapper">
+              <canvas class="signature-canvas" id="sig1Canvas"></canvas>
+              <div class="signature-placeholder">Tap to sign</div>
+              <div class="signature-line"></div>
+              <button class="signature-clear" onclick="clearSignature('sig1')">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:20px">
+          <label class="field-label">Client Signature Date</label>
+          <div class="field-row-3">
+            <select class="field-input" id="sigDay"></select>
+            <select class="field-input" id="sigMonth"></select>
+            <select class="field-input" id="sigYear"></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Marketing Consent -->
+      <div class="form-card">
+        <div class="card-title">
+          <svg width="18" height="18" fill="none" stroke="var(--brand)" stroke-width="2" style="vertical-align:-3px;margin-right:6px"><rect x="1" y="3" width="16" height="12" rx="2"/><path d="M1 3l8 6 8-6"/></svg>
+          Keep Updated with Offers/News?
+        </div>
+        <p style="font-size:13px;color:var(--text-light);margin-bottom:16px;line-height:1.6">
+          Can we contact you regarding appointments? Pictures taken will only be used by the salon and we will ask for prior consent. If you agree please select Yes.
+        </p>
+        <div class="radio-group" id="marketingRadio">
+          <div class="radio-option" onclick="selectRadio(this, 'marketing', 'Yes')">
+            <input type="radio" name="marketing" value="Yes"> Yes
+          </div>
+          <div class="radio-option" onclick="selectRadio(this, 'marketing', 'No')">
+            <input type="radio" name="marketing" value="No"> No
+          </div>
+        </div>
+      </div>
+
+      <!-- GDPR Notice -->
+      <div class="form-card">
+        <div class="card-title">
+          <svg width="18" height="18" fill="none" stroke="var(--brand)" stroke-width="2" style="vertical-align:-3px;margin-right:6px"><rect x="3" y="5" width="12" height="13" rx="1"/><path d="M7 1v4M11 1v4M7 10h4M7 13h2"/></svg>
+          GDPR
+        </div>
+        <div class="gdpr-text">
+          <p style="margin-bottom:10px">I am collecting the data on the client consultation forms to ensure that I can safely perform your treatment &amp; to be able to contact you with regards to appointments/marketing. I need to store this data to comply with my public &amp; product liability insurance &amp; to be able to safely continue treatments &amp; keep records of all products used should any issues/allergies/problems arise.</p>
+          <p style="margin-bottom:10px">I will store this data in a secure location Ovatu. You can request to see a copy of this data by writing to <strong>no.1lashandbrowstudio@yahoo.com</strong></p>
+          <p style="margin-bottom:10px">When taking card payments I use a third party Izettle, where only your name &amp; last 4 digits of your card are stored. I collect this data so that I can complete my accounts accordingly for HMRC. This data is not shared with anyone and is on a secure device.</p>
+          <p style="margin-bottom:10px">We are now digital on all forms, these will collect the same data as the paper forms &amp; will be stored on the secure Ovatu booking system. My iPad is password protected.</p>
+          <p style="margin-bottom:10px">I will store ALL necessary data for 7 years to comply with my legal obligations but it will be reviewed on a yearly basis where you can opt out. If you choose to opt out, I will have to keep your data on file for insurance/account purposes. You can opt out at any time by contacting me in writing to <strong>no.1lashandbrowstudio@yahoo.com</strong></p>
+          <p style="margin-bottom:10px">If you decide to opt out &amp; withdraw consent I will no longer be able to perform treatments on you.</p>
+          <p>Consent to contact you regarding appointments and marketing. Consent to have pictures taken of your eyelashes to be used on my social media platforms (Facebook, Twitter, website, Instagram).</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <button class="btn btn-secondary" id="btnPrev" onclick="prevStep()" style="visibility:hidden">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L4 8l6 5"/></svg>
+      Previous
+    </button>
+    <span style="font-size:13px;color:var(--text-muted)" id="stepCount">Step 1 of 3</span>
+    <button class="btn btn-primary" id="btnNext" onclick="nextStep()">
+      Next
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l6 5-6 5"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ═══ SUCCESS MODAL ═══ -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal">
+    <div class="modal-icon success">
+      <svg width="32" height="32" fill="none" stroke="#5A8A6A" stroke-width="2.5"><polyline points="8,16 14,22 24,10"/></svg>
+    </div>
+    <h3 class="modal-title">Form Complete!</h3>
+    <p class="modal-text" id="modalText">PDF has been generated and downloaded.</p>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="emailPDF()" id="emailBtn" style="display:none">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;margin-right:4px"><rect x="1" y="3" width="14" height="10" rx="2"/><path d="M1 3l7 5 7-5"/></svg>
+        Email PDF to Charlotte
+      </button>
+      <button class="btn btn-secondary" onclick="downloadLastPDF()" id="downloadPDFBtn">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;margin-right:4px"><path d="M8 2v10M4 8l4 4 4-4"/><path d="M2 14h12"/></svg>
+        Download PDF
+      </button>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:10px;justify-content:center">
+      <button class="btn btn-secondary" onclick="closeModal()" style="font-size:13px">Close</button>
+      <button class="btn btn-success" onclick="resetAll(); closeModal()" style="font-size:13px">New Client</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════
+
+const CONDITIONS = [
+  'Cataract',
+  'Conjunctivitis',
+  'Cancer',
+  'Undergoing chemotherapy',
+  'Diabetic retinopathy',
+  'Dry eye syndrome',
+  'Glaucoma',
+  'Contagious or infectious disease',
+  'Taking any drugs or medication',
+  'Using products containing Retin-A, AHA/BHA',
+  'Pregnant',
+  'Breastfeeding',
+  'Asthma',
+  'Hyper sensitive skin',
+  'Sunburn or windburn',
+  'Any skin conditions',
+  'Wear contact lenses',
+  'Any allergies',
+  'Eye problems in the last 4 weeks',
+  'Use any eye products',
+  'Taking skin thinning medication (e.g. Roaccutane)',
+  'PPD allergies',
+  'Hair dye allergies',
+  'Tint allergy',
+  'Reactions to previous treatments',
+  'Symptoms of COVID-19',
+  'Been in contact with anyone with symptoms or positive test'
+];
+
+// ═══════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════
+let currentStep = 1;
+const signatures = {};
+let lastPdfBlob = null;
+let lastPdfFilename = '';
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  populateDateSelects('dob');
+  populateDateSelects('sig', true);
+  buildToggles('conditionsGrid', CONDITIONS);
+  initSignaturePad('sig1');
+
+  function showApp() {
+    const splash = document.getElementById('splash');
+    const app = document.getElementById('app');
+    if (splash) { splash.classList.add('fade-out'); setTimeout(() => splash.style.display = 'none', 800); }
+    if (app) app.classList.add('visible');
+  }
+  setTimeout(showApp, 1500);
+});
+
+function populateDateSelects(prefix, setToday = false) {
+  const dayEl = document.getElementById(`${prefix}Day`);
+  const monthEl = document.getElementById(`${prefix}Month`);
+  const yearEl = document.getElementById(`${prefix}Year`);
+
+  // Days
+  dayEl.innerHTML = '<option value="">Day</option>';
+  for (let d = 1; d <= 31; d++) {
+    dayEl.innerHTML += `<option value="${d}">${d}</option>`;
+  }
+
+  // Months
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  monthEl.innerHTML = '<option value="">Month</option>';
+  months.forEach((m, i) => {
+    monthEl.innerHTML += `<option value="${i + 1}">${m}</option>`;
+  });
+
+  // Years (2028 down to 1907)
+  yearEl.innerHTML = '<option value="">Year</option>';
+  for (let y = 2028; y >= 1907; y--) {
+    yearEl.innerHTML += `<option value="${y}">${y}</option>`;
+  }
+
+  if (setToday) {
+    const now = new Date();
+    dayEl.value = now.getDate();
+    monthEl.value = now.getMonth() + 1;
+    yearEl.value = now.getFullYear();
+  }
+}
+
+// ═══════════════════════════════════════
+//  TOGGLE BUILDERS
+// ═══════════════════════════════════════
+function buildToggles(containerId, items) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = items.map((item, i) => `
+    <div class="toggle-item" onclick="toggleYesNo(this)">
+      <span class="toggle-label">${item}</span>
+      <label class="toggle-switch" onclick="event.stopPropagation()">
+        <input type="checkbox" name="${containerId}_${i}" onchange="this.closest('.toggle-item').classList.toggle('yes', this.checked)">
+        <span class="toggle-track"></span>
+        <span class="toggle-thumb"></span>
+      </label>
+    </div>
+  `).join('');
+}
+
+function toggleYesNo(el) {
+  const input = el.querySelector('input[type=checkbox]');
+  input.checked = !input.checked;
+  el.classList.toggle('yes', input.checked);
+}
+
+function toggleConsent(el) {
+  const input = el.querySelector('input[type=checkbox]');
+  input.checked = !input.checked;
+  el.classList.toggle('checked', input.checked);
+}
+
+function selectRadio(el, name, value) {
+  document.querySelectorAll(`input[name="${name}"]`).forEach(inp => {
+    inp.closest('.radio-option').classList.remove('selected');
+  });
+  el.classList.add('selected');
+  el.querySelector('input').checked = true;
+}
+
+// ═══════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════
+function goToStep(step) {
+  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+  document.getElementById(`step${step}`).classList.add('active');
+
+  document.querySelectorAll('.step-dot').forEach((dot, i) => {
+    dot.classList.remove('active');
+    if (i + 1 < step) dot.classList.add('completed');
+    else dot.classList.remove('completed');
+    if (i + 1 === step) dot.classList.add('active');
+  });
+
+  const labels = ['Personal Details', 'Health & Conditions', 'Declaration & Consent'];
+  document.getElementById('stepLabel').textContent = labels[step - 1];
+  document.getElementById('progressFill').style.width = `${(step / 3) * 100}%`;
+  document.getElementById('stepCount').textContent = `Step ${step} of 3`;
+
+  document.getElementById('btnPrev').style.visibility = step === 1 ? 'hidden' : 'visible';
+
+  const btnNext = document.getElementById('btnNext');
+  if (step === 3) {
+    btnNext.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M8 3l5 5-5 5"/></svg> Save & Submit`;
+    btnNext.classList.remove('btn-primary');
+    btnNext.classList.add('btn-success');
+  } else {
+    btnNext.innerHTML = `Next <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l6 5-6 5"/></svg>`;
+    btnNext.classList.add('btn-primary');
+    btnNext.classList.remove('btn-success');
+  }
+
+  currentStep = step;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function nextStep() {
+  if (currentStep < 3) {
+    goToStep(currentStep + 1);
+  } else {
+    submitForm();
+  }
+}
+
+function prevStep() {
+  if (currentStep > 1) goToStep(currentStep - 1);
+}
+
+// ═══════════════════════════════════════
+//  SIGNATURE PAD
+// ═══════════════════════════════════════
+function initSignaturePad(id) {
+  const canvas = document.getElementById(`${id}Canvas`);
+  const wrapper = document.getElementById(`${id}Wrapper`);
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+  let hasContent = false;
+  let lastPoint = null;
+
+  canvas.style.touchAction = 'none';
+  canvas.style.webkitTouchCallout = 'none';
+  canvas.style.webkitUserSelect = 'none';
+  canvas.style.userSelect = 'none';
+  canvas.style.msTouchAction = 'none';
+  wrapper.style.touchAction = 'none';
+
+  function resize() {
+    const saved = hasContent ? canvas.toDataURL() : null;
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    ctx.strokeStyle = '#2C1E14';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    if (saved && hasContent) {
+      const img = new Image();
+      img.onload = () => { ctx.drawImage(img, 0, 0, rect.width, rect.height); };
+      img.src = saved;
+    }
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    let clientX, clientY;
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else if (e.changedTouches && e.changedTouches.length > 0) {
+      clientX = e.changedTouches[0].clientX;
+      clientY = e.changedTouches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+    return { x: clientX - rect.left, y: clientY - rect.top };
+  }
+
+  function startDraw(e) {
+    e.preventDefault(); e.stopPropagation();
+    drawing = true;
+    const pos = getPos(e);
+    lastPoint = pos;
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+    ctx.arc(pos.x, pos.y, 0.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function moveDraw(e) {
+    if (!drawing) return;
+    e.preventDefault(); e.stopPropagation();
+    const pos = getPos(e);
+    if (lastPoint) {
+      const midX = (lastPoint.x + pos.x) / 2;
+      const midY = (lastPoint.y + pos.y) / 2;
+      ctx.quadraticCurveTo(lastPoint.x, lastPoint.y, midX, midY);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(midX, midY);
+    }
+    lastPoint = pos;
+    if (!hasContent) {
+      hasContent = true;
+      wrapper.classList.add('has-signature');
+    }
+  }
+
+  function endDraw(e) {
+    if (drawing) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      if (lastPoint) { ctx.lineTo(lastPoint.x, lastPoint.y); ctx.stroke(); }
+      drawing = false;
+      lastPoint = null;
+    }
+  }
+
+  canvas.addEventListener('touchstart', startDraw, { passive: false });
+  canvas.addEventListener('touchmove', moveDraw, { passive: false });
+  canvas.addEventListener('touchend', endDraw, { passive: false });
+  canvas.addEventListener('touchcancel', endDraw, { passive: false });
+  canvas.addEventListener('mousedown', startDraw, { passive: false });
+  canvas.addEventListener('mousemove', moveDraw, { passive: false });
+  canvas.addEventListener('mouseup', endDraw, { passive: false });
+  canvas.addEventListener('mouseleave', endDraw, { passive: false });
+
+  document.body.addEventListener('touchmove', function(e) {
+    if (e.target === canvas) { e.preventDefault(); }
+  }, { passive: false });
+
+  signatures[id] = {
+    canvas, ctx, wrapper,
+    clear() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      ctx.clearRect(0, 0, rect.width * dpr, rect.height * dpr);
+      hasContent = false;
+      wrapper.classList.remove('has-signature');
+      ctx.strokeStyle = '#2C1E14';
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+    },
+    hasContent() { return hasContent; },
+    toDataURL() { return canvas.toDataURL('image/png'); }
+  };
+}
+
+function clearSignature(id) {
+  signatures[id].clear();
+}
+
+// ═══════════════════════════════════════
+//  PDF GENERATION
+// ═══════════════════════════════════════
+function generatePDF() {
+  if (typeof window.jspdf === 'undefined') {
+    throw new Error('PDF library not loaded. Please ensure you have an internet connection and reload.');
+  }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const pageW = 210;
+  const margin = 20;
+  const contentW = pageW - margin * 2;
+  let y = 20;
+
+  function checkPage(needed) {
+    if (y + needed > 275) { doc.addPage(); y = 20; }
+  }
+
+  function addHeader() {
+    doc.setFillColor(74, 55, 40);
+    doc.rect(0, 0, pageW, 35, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.text('refine. by Charlotte', margin, 18);
+    doc.setFontSize(12);
+    doc.text('Korean Lash Lift — Treatment Consultation', margin, 28);
+    doc.setTextColor(44, 30, 20);
+    y = 45;
+  }
+
+  function addField(label, value) {
+    checkPage(14);
+    doc.setFontSize(8);
+    doc.setTextColor(122, 107, 96);
+    doc.text(label.toUpperCase(), margin, y);
+    doc.setFontSize(11);
+    doc.setTextColor(44, 30, 20);
+    doc.text(String(value || '—'), margin, y + 5);
+    y += 12;
+  }
+
+  function addSection(title) {
+    checkPage(12);
+    y += 4;
+    doc.setFontSize(12);
+    doc.setTextColor(74, 55, 40);
+    doc.text(title, margin, y);
+    doc.setDrawColor(224, 216, 208);
+    doc.line(margin, y + 2, pageW - margin, y + 2);
+    y += 8;
+  }
+
+  function addSignature(id, label) {
+    checkPage(35);
+    doc.setFontSize(8);
+    doc.setTextColor(122, 107, 96);
+    doc.text(label, margin, y);
+    y += 3;
+    if (signatures[id] && signatures[id].hasContent()) {
+      try {
+        const imgData = signatures[id].toDataURL();
+        doc.addImage(imgData, 'PNG', margin, y, 60, 25);
+        y += 28;
+      } catch(e) { y += 5; }
+    } else {
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, y + 10, margin + 60, y + 10);
+      y += 15;
+    }
+  }
+
+  // Build PDF
+  addHeader();
+
+  // Personal Details
+  addField('Name', document.getElementById('clientName').value);
+  addField('Address', document.getElementById('clientAddress').value);
+
+  const dobDay = document.getElementById('dobDay').value;
+  const dobMonth = document.getElementById('dobMonth').value;
+  const dobYear = document.getElementById('dobYear').value;
+  const dobStr = (dobDay && dobMonth && dobYear) ? `${dobDay}/${dobMonth}/${dobYear}` : '—';
+  addField('Date of Birth', dobStr);
+  addField('Contact Number', document.getElementById('clientPhone').value);
+
+  // Conditions
+  addSection('Health Conditions');
+  const condGrid = document.getElementById('conditionsGrid');
+  const condChecks = condGrid.querySelectorAll('input[type=checkbox]');
+  const yesConditions = [];
+  condChecks.forEach((chk, i) => {
+    if (chk.checked) yesConditions.push(CONDITIONS[i]);
+  });
+  if (yesConditions.length === 0) {
+    doc.setFontSize(9);
+    doc.setTextColor(122, 107, 96);
+    doc.text('None reported', margin, y);
+    y += 6;
+  } else {
+    yesConditions.forEach(item => {
+      checkPage(8);
+      doc.setFontSize(9);
+      doc.setTextColor(184, 84, 80);
+      doc.text('YES — ' + item, margin, y, { maxWidth: contentW });
+      y += Math.ceil(doc.getTextDimensions(item, { maxWidth: contentW }).h) + 4;
+    });
+  }
+
+  // Details
+  addSection('Details & Medications');
+  doc.setFontSize(9);
+  doc.setTextColor(44, 30, 20);
+  const details = document.getElementById('medDetails').value || 'N/A';
+  doc.text(details, margin, y, { maxWidth: contentW });
+  y += Math.ceil(doc.getTextDimensions(details, { maxWidth: contentW }).h) + 4;
+
+  // Retinol
+  const retinolVal = document.querySelector('input[name="retinol"]:checked');
+  addField('Using Retinol', retinolVal ? retinolVal.value : 'Not answered');
+
+  // Declaration
+  addSection('Declaration');
+  const declCheck = document.querySelector('input[name="declaration"]');
+  doc.setFontSize(9);
+  doc.setTextColor(declCheck && declCheck.checked ? 90 : 180, declCheck && declCheck.checked ? 138 : 180, declCheck && declCheck.checked ? 106 : 180);
+  doc.text((declCheck && declCheck.checked ? '✓ ' : '○ ') + 'Client declaration confirmed', margin, y);
+  y += 8;
+
+  addSignature('sig1', 'Client Signature');
+
+  const sigDay = document.getElementById('sigDay').value;
+  const sigMonth = document.getElementById('sigMonth').value;
+  const sigYear = document.getElementById('sigYear').value;
+  const sigDateStr = (sigDay && sigMonth && sigYear) ? `${sigDay}/${sigMonth}/${sigYear}` : '—';
+  addField('Signature Date', sigDateStr);
+
+  // Marketing
+  const marketingVal = document.querySelector('input[name="marketing"]:checked');
+  addField('Marketing Consent', marketingVal ? marketingVal.value : 'Not answered');
+
+  // GDPR footer
+  checkPage(15);
+  y += 4;
+  doc.setFontSize(7);
+  doc.setTextColor(160, 152, 136);
+  doc.text('GDPR: Data stored securely in Ovatu for treatment & insurance purposes. Contact no.1lashandbrowstudio@yahoo.com to opt out.', margin, y, { maxWidth: contentW });
+
+  return doc;
+}
+
+// ═══════════════════════════════════════
+//  SUBMIT
+// ═══════════════════════════════════════
+async function submitForm() {
+  const clientName = document.getElementById('clientName').value.trim();
+  if (!clientName) {
+    showToast('Please enter the client name.', 'error');
+    goToStep(1);
+    return;
+  }
+
+  const btnNext = document.getElementById('btnNext');
+  btnNext.disabled = true;
+  btnNext.innerHTML = '<div class="spinner"></div> Saving...';
+
+  try {
+    const doc = generatePDF();
+    const pdfBlob = doc.output('blob');
+    const date = new Date().toISOString().split('T')[0];
+    const filename = `${clientName.replace(/\s+/g, '_')}_KoreanLashLift_${date}.pdf`;
+
+    lastPdfBlob = pdfBlob;
+    lastPdfFilename = filename;
+
+    // Auto-download
+    const url = URL.createObjectURL(pdfBlob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    // Show modal
+    const modalText = document.getElementById('modalText');
+    modalText.innerHTML = `<strong>"${filename}"</strong> has been downloaded.`;
+
+    // Show email button with Charlotte's email
+    const emailBtn = document.getElementById('emailBtn');
+    emailBtn.style.display = 'inline-flex';
+
+    document.getElementById('successModal').classList.add('visible');
+
+  } catch (e) {
+    showToast('Error generating PDF: ' + e.message, 'error');
+  }
+
+  btnNext.disabled = false;
+  btnNext.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M8 3l5 5-5 5"/></svg> Save & Submit`;
+}
+
+function downloadLastPDF() {
+  if (!lastPdfBlob) {
+    showToast('No PDF available. Please submit the form first.', 'error');
+    return;
+  }
+  const url = URL.createObjectURL(lastPdfBlob);
+  const a = document.createElement('a');
+  a.href = url; a.download = lastPdfFilename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('PDF downloaded!', 'success');
+}
+
+function emailPDF() {
+  const email = 'refinebycharlotte@gmail.com';
+  const clientName = document.getElementById('clientName').value.trim() || 'Client';
+  const date = new Date().toLocaleDateString('en-GB');
+
+  const subject = encodeURIComponent(`Korean Lash Lift Form — ${clientName} — ${date}`);
+  const body = encodeURIComponent(
+`Hi Charlotte,
+
+Please find attached the completed Korean Lash Lift consultation form for ${clientName}, dated ${date}.
+
+The PDF should be attached to this email. If it isn't attached, please download it from the forms app and attach it manually.
+
+Thank you`
+  );
+
+  if (lastPdfBlob) {
+    const url = URL.createObjectURL(lastPdfBlob);
+    const a = document.createElement('a');
+    a.href = url; a.download = lastPdfFilename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  window.location.href = `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
+  showToast('Opening email — please attach the downloaded PDF', 'success');
+}
+
+// ═══════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════
+function showToast(msg, type = '') {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast visible ' + type;
+  setTimeout(() => toast.classList.remove('visible'), 4000);
+}
+
+function closeModal() {
+  document.getElementById('successModal').classList.remove('visible');
+}
+
+function resetAll() {
+  if (!confirm('Start a new client? This will clear all form data.')) return;
+
+  document.querySelectorAll('.field-input').forEach(el => {
+    if (el.tagName === 'SELECT') {
+      el.selectedIndex = 0;
+    } else {
+      el.value = '';
+    }
+  });
+
+  document.querySelectorAll('.toggle-item').forEach(el => {
+    el.classList.remove('yes');
+    el.querySelector('input').checked = false;
+  });
+
+  document.querySelectorAll('.consent-item').forEach(el => {
+    el.classList.remove('checked');
+    el.querySelector('input').checked = false;
+  });
+
+  document.querySelectorAll('.radio-option').forEach(el => {
+    el.classList.remove('selected');
+    el.querySelector('input').checked = false;
+  });
+
+  Object.values(signatures).forEach(s => s.clear());
+
+  // Reset sig date to today
+  populateDateSelects('sig', true);
+
+  goToStep(1);
+  showToast('Form cleared for new client', 'success');
+}
+</script>
+
+<!-- Failsafe: always show app after 3 seconds -->
+<script>
+setTimeout(function() {
+  var splash = document.getElementById('splash');
+  var app = document.getElementById('app');
+  if (splash && splash.style.display !== 'none') { splash.style.display = 'none'; }
+  if (app && !app.classList.contains('visible')) { app.classList.add('visible'); }
+}, 3000);
+</script>
+</body>
+</html>
