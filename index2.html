@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Refine by Charlotte">
+<title>Refine by Charlotte â€” Client Forms</title>
+
+<!-- Google API (optional - for Drive saving) -->
+<script src="https://apis.google.com/js/api.js" async defer onerror="console.log('Google API not loaded - offline mode')"></script>
+<script src="https://accounts.google.com/gsi/client" async defer onerror="console.log('Google Identity not loaded - offline mode')"></script>
+
+<!-- jsPDF for PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" async defer onerror="console.log('jsPDF not loaded - PDF export unavailable offline')"></script>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --brand: #4A3728;
+  --brand-light: #6B5344;
+  --brand-lighter: #8B7366;
+  --cream: #FAF7F4;
+  --cream-dark: #F0EBE6;
+  --warm-white: #FDFCFB;
+  --text: #2C1E14;
+  --text-light: #7A6B60;
+  --text-muted: #A89888;
+  --accent: #C4956A;
+  --accent-light: #E8D5C0;
+  --success: #5A8A6A;
+  --success-light: #E8F2EC;
+  --error: #B85450;
+  --error-light: #FCEEED;
+  --border: #E0D8D0;
+  --shadow: rgba(74, 55, 40, 0.08);
+  --shadow-md: rgba(74, 55, 40, 0.12);
+  --radius: 12px;
+  --radius-lg: 20px;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* â•â•â• SPLASH SCREEN â•â•â• */
+.splash {
+  position: fixed; inset: 0; z-index: 1000;
+  background: var(--brand);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.splash.fade-out { opacity: 0; transform: scale(1.05); pointer-events: none; }
+.splash-logo {
+  width: 120px; height: 120px;
+  background: var(--warm-white);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  animation: splashPulse 2s ease-in-out infinite;
+}
+.splash-logo span {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px; font-weight: 300;
+  color: var(--brand); letter-spacing: 1px;
+}
+.splash-subtitle {
+  margin-top: 20px; color: var(--accent-light);
+  font-size: 13px; letter-spacing: 3px; text-transform: uppercase;
+  font-weight: 300;
+}
+@keyframes splashPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+/* â•â•â• APP SHELL â•â•â• */
+.app {
+  display: none; flex-direction: column;
+  min-height: 100vh; min-height: 100dvh;
+}
+.app.visible { display: flex; }
+
+/* â•â•â• HEADER â•â•â• */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(250, 247, 244, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.header-logo {
+  display: flex; align-items: center; gap: 12px;
+}
+.header-logo-circle {
+  width: 44px; height: 44px;
+  background: var(--brand);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.header-logo-circle span {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 14px; font-weight: 300;
+  color: var(--warm-white); letter-spacing: 0.5px;
+}
+.header-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 400; color: var(--brand);
+}
+.header-actions { display: flex; gap: 8px; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px;
+  border: none; border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: all var(--transition);
+  white-space: nowrap;
+}
+.btn-primary {
+  background: var(--brand); color: white;
+  box-shadow: 0 2px 8px var(--shadow-md);
+}
+.btn-primary:hover { background: var(--brand-light); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.btn-secondary {
+  background: var(--warm-white); color: var(--brand);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { background: var(--cream-dark); }
+.btn-icon {
+  width: 44px; height: 44px; padding: 0;
+  border-radius: 50%; justify-content: center;
+}
+.btn-success { background: var(--success); color: white; }
+.btn-success:hover { background: #4A7A5A; }
+
+/* â•â•â• PROGRESS BAR â•â•â• */
+.progress-bar {
+  background: var(--cream-dark);
+  height: 4px; width: 100%;
+}
+.progress-fill {
+  height: 100%; background: var(--accent);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 0 2px 2px 0;
+}
+
+/* â•â•â• STEP INDICATORS â•â•â• */
+.steps-nav {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 20px 24px 0;
+}
+.step-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: all var(--transition);
+  cursor: pointer;
+}
+.step-dot.active { background: var(--brand); width: 28px; border-radius: 5px; }
+.step-dot.completed { background: var(--success); }
+.step-label {
+  font-size: 12px; color: var(--text-muted);
+  text-align: center; margin-top: 12px;
+  font-weight: 500; letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* â•â•â• MAIN CONTENT â•â•â• */
+.main {
+  flex: 1; padding: 20px 24px 120px;
+  max-width: 800px; margin: 0 auto; width: 100%;
+}
+
+/* â•â•â• FORM SECTIONS â•â•â• */
+.form-section {
+  display: none;
+  animation: fadeSlideIn 0.5s ease forwards;
+}
+.form-section.active { display: block; }
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section-header {
+  margin-bottom: 28px;
+}
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 32px; font-weight: 400;
+  color: var(--brand); line-height: 1.2;
+}
+.section-subtitle {
+  font-size: 14px; color: var(--text-light);
+  margin-top: 8px; line-height: 1.5;
+}
+
+/* â•â•â• FORM CARD â•â•â• */
+.form-card {
+  background: var(--warm-white);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 4px var(--shadow);
+  transition: all var(--transition);
+}
+.form-card:hover { box-shadow: 0 4px 16px var(--shadow-md); }
+
+.card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px; font-weight: 500;
+  color: var(--brand); margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--cream-dark);
+}
+
+/* â•â•â• TOGGLE GRID (Yes/No) â•â•â• */
+.toggle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+@media (max-width: 600px) {
+  .toggle-grid { grid-template-columns: 1fr; }
+}
+
+.toggle-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--cream);
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  transition: all var(--transition);
+  cursor: pointer;
+  -webkit-user-select: none; user-select: none;
+}
+.toggle-item:active { transform: scale(0.98); }
+.toggle-item.yes {
+  background: var(--error-light);
+  border-color: var(--error);
+}
+
+.toggle-label {
+  font-size: 13px; font-weight: 400;
+  color: var(--text); flex: 1;
+  line-height: 1.3;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 52px; height: 28px;
+  flex-shrink: 0; margin-left: 12px;
+}
+.toggle-switch input { display: none; }
+.toggle-track {
+  position: absolute; inset: 0;
+  background: var(--border);
+  border-radius: 14px;
+  transition: background var(--transition);
+}
+.toggle-switch input:checked + .toggle-track {
+  background: var(--error);
+}
+.toggle-thumb {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 22px; height: 22px;
+  background: white;
+  border-radius: 50%;
+  transition: transform var(--transition);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.toggle-switch input:checked ~ .toggle-thumb {
+  transform: translateX(24px);
+}
+
+/* â•â•â• INPUT FIELDS â•â•â• */
+.field-group {
+  margin-bottom: 18px;
+}
+.field-label {
+  display: block;
+  font-size: 12px; font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.field-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: var(--text);
+  background: var(--cream);
+  transition: all var(--transition);
+  -webkit-appearance: none;
+}
+.field-input:focus {
+  outline: none;
+  border-color: var(--brand);
+  background: var(--warm-white);
+  box-shadow: 0 0 0 3px rgba(74, 55, 40, 0.1);
+}
+.field-input::placeholder { color: var(--text-muted); }
+
+textarea.field-input {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.field-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+/* â•â•â• CONSENT CHECKBOXES â•â•â• */
+.consent-list { display: flex; flex-direction: column; gap: 12px; }
+
+.consent-item {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 16px;
+  background: var(--cream);
+  border-radius: var(--radius);
+  border: 1.5px solid transparent;
+  transition: all var(--transition);
+  cursor: pointer;
+  -webkit-user-select: none; user-select: none;
+}
+.consent-item:active { transform: scale(0.99); }
+.consent-item.checked {
+  background: var(--success-light);
+  border-color: var(--success);
+}
+
+.consent-check {
+  width: 24px; height: 24px; flex-shrink: 0;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition);
+  margin-top: 1px;
+}
+.consent-item.checked .consent-check {
+  background: var(--success);
+  border-color: var(--success);
+}
+.consent-check svg { opacity: 0; transition: opacity 0.2s; }
+.consent-item.checked .consent-check svg { opacity: 1; }
+
+.consent-text {
+  font-size: 13px; line-height: 1.6;
+  color: var(--text);
+}
+.consent-item input { display: none; }
+
+/* â•â•â• SIGNATURE PAD â•â•â• */
+.signature-area {
+  margin-top: 20px;
+}
+.signature-pad-wrapper {
+  position: relative;
+  background: white;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  touch-action: none;
+}
+.signature-pad-wrapper.has-signature {
+  border-style: solid;
+  border-color: var(--success);
+}
+.signature-canvas {
+  width: 100%; height: 180px;
+  display: block;
+  cursor: crosshair;
+}
+.signature-placeholder {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px; color: var(--text-muted);
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.signature-pad-wrapper.has-signature .signature-placeholder { opacity: 0; }
+.signature-clear {
+  position: absolute; top: 8px; right: 8px;
+  background: var(--cream); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 12px;
+  font-size: 12px; color: var(--text-light);
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+}
+.signature-line {
+  position: absolute; bottom: 40px;
+  left: 24px; right: 24px;
+  height: 1px; background: var(--border);
+  pointer-events: none;
+}
+
+/* â•â•â• PREGNANCY RADIO â•â•â• */
+.radio-group {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.radio-option {
+  padding: 12px 24px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px; font-weight: 500;
+  cursor: pointer; transition: all var(--transition);
+  background: var(--cream);
+  -webkit-user-select: none; user-select: none;
+}
+.radio-option:active { transform: scale(0.97); }
+.radio-option.selected {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: white;
+}
+.radio-option input { display: none; }
+
+/* â•â•â• BOTTOM NAV â•â•â• */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(250, 247, 244, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  padding: 16px 24px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  display: flex; justify-content: space-between; align-items: center;
+  z-index: 100;
+}
+
+/* â•â•â• MODAL â•â•â• */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(44, 30, 20, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: none; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.modal-overlay.visible { display: flex; }
+.modal {
+  background: var(--warm-white);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+  max-width: 440px; width: 100%;
+  box-shadow: 0 20px 60px rgba(44, 30, 20, 0.25);
+  text-align: center;
+  animation: modalIn 0.4s ease;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-icon {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+}
+.modal-icon.success { background: var(--success-light); }
+.modal-icon.error { background: var(--error-light); }
+.modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px; font-weight: 500;
+  color: var(--brand); margin-bottom: 8px;
+}
+.modal-text { font-size: 14px; color: var(--text-light); line-height: 1.5; margin-bottom: 24px; }
+.modal-actions { display: flex; gap: 10px; justify-content: center; }
+
+/* â•â•â• LOADING SPINNER â•â•â• */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2.5px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* â•â•â• TOAST â•â•â• */
+.toast {
+  position: fixed; top: 24px; right: 24px; z-index: 300;
+  background: var(--brand);
+  color: white; padding: 14px 22px;
+  border-radius: var(--radius);
+  font-size: 14px; font-weight: 500;
+  box-shadow: 0 8px 24px var(--shadow-md);
+  transform: translateY(-100px);
+  opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.toast.visible { transform: translateY(0); opacity: 1; }
+.toast.error { background: var(--error); }
+.toast.success { background: var(--success); }
+
+/* â•â•â• SETTINGS PANEL â•â•â• */
+.settings-panel {
+  display: none;
+  position: fixed; inset: 0; z-index: 150;
+  background: var(--cream);
+  padding: 24px;
+  overflow-y: auto;
+  animation: slideUp 0.4s ease;
+}
+.settings-panel.visible { display: block; }
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* â•â•â• RESPONSIVE â•â•â• */
+@media (min-width: 1024px) {
+  .main { max-width: 860px; padding: 32px 40px 120px; }
+  .toggle-grid { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+/* â•â•â• SHARE TABS â•â•â• */
+.share-tab { border: 1.5px solid var(--border); transition: all 0.2s; }
+.share-tab.active { background: var(--brand); color: white; border-color: var(--brand); }
+
+/* â•â•â• PRINT â•â•â• */
+
+/* === TREATMENT SELECTOR === */
+.treatment-selector { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:60px 24px; animation:fadeSlideIn 0.5s ease forwards; }
+.treatment-selector .section-title { text-align:center; margin-bottom:8px; }
+.treatment-selector .section-subtitle { text-align:center; margin-bottom:36px; }
+.treatment-cards { display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:560px; width:100%; }
+@media (max-width:500px) { .treatment-cards { grid-template-columns:1fr; } }
+.treatment-card { background:var(--warm-white); border:2px solid var(--border); border-radius:var(--radius-lg); padding:32px 24px; text-align:center; cursor:pointer; transition:all var(--transition); -webkit-user-select:none; user-select:none; }
+.treatment-card:hover { border-color:var(--accent); box-shadow:0 8px 24px var(--shadow-md); transform:translateY(-2px); }
+.treatment-card:active { transform:translateY(0); }
+.treatment-card .card-icon { width:56px; height:56px; background:var(--cream); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }
+.treatment-card h3 { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:500; color:var(--brand); margin-bottom:8px; }
+.treatment-card p { font-size:13px; color:var(--text-light); line-height:1.5; }
+select.field-input { cursor:pointer; padding-right:36px; }
+.gdpr-text { font-size:12px; color:var(--text-light); line-height:1.7; }
+.form-nav-hidden { display:none !important; }
+
+@media print {
+  .header, .bottom-nav, .steps-nav, .progress-bar, .btn { display: none !important; }
+  .form-section { display: block !important; page-break-after: always; }
+  .main { max-width: 100%; padding: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- â•â•â• SPLASH â•â•â• -->
+<div class="splash" id="splash">
+  <div class="splash-logo"><span>refine.</span></div>
+  <div class="splash-subtitle">by Charlotte</div>
+</div>
+
+<!-- â•â•â• TOAST â•â•â• -->
+<div class="toast" id="toast"></div>
+
+<!-- â•â•â• APP â•â•â• -->
+<div class="app" id="app">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-logo">
+      <div class="header-logo-circle"><span>r.</span></div>
+      <span class="header-title">Client Forms</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary btn-icon" onclick="showShareModal()" title="Email Form">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="16" height="13" rx="2"/><path d="M2 4l8 6 8-6"/></svg>
+      </button>
+      <button class="btn btn-secondary btn-icon" onclick="resetAll()" title="New Client">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v10M7 10h10"/></svg>
+      </button>
+      <button class="btn btn-secondary btn-icon" onclick="showSettings()" title="Settings">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10" cy="10" r="3"/><path d="M10 2v3M10 15v3M2 10h3M15 10h3M4.2 4.2l2.1 2.1M13.7 13.7l2.1 2.1M4.2 15.8l2.1-2.1M13.7 6.3l2.1-2.1"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Progress -->
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%"></div></div>
+
+  <div class="steps-nav form-nav-hidden" id="stepsNav">
+    <div class="step-dot active" data-step="1" onclick="goToStep(1)"></div>
+    <div class="step-dot" data-step="2" onclick="goToStep(2)"></div>
+    <div class="step-dot" data-step="3" onclick="goToStep(3)"></div>
+  </div>
+  <div class="step-label form-nav-hidden" id="stepLabel">Medical Health Form</div>
+
+  <main class="main">
+
+    <!-- TREATMENT SELECTOR -->
+    <div class="treatment-selector" id="treatmentSelector">
+      <h1 class="section-title">Client Forms</h1>
+      <p class="section-subtitle">Select the treatment to begin.</p>
+      <div class="treatment-cards">
+        <div class="treatment-card" onclick="selectTreatment('eyebrows')">
+          <div class="card-icon"><svg width="28" height="28" fill="none" stroke="#4A3728" stroke-width="1.5" viewBox="0 0 24 24"><path d="M2 12c2-4 5-7 10-7s8 3 10 7"/><path d="M2 12c2 2 5 3 10 3s8-1 10-3"/></svg></div>
+          <h3>Semi Permanent Eyebrows</h3>
+          <p>Medical health, treatment record &amp; consent forms</p>
+        </div>
+        <div class="treatment-card" onclick="selectTreatment('lashlift')">
+          <div class="card-icon"><svg width="28" height="28" fill="none" stroke="#4A3728" stroke-width="1.5" viewBox="0 0 24 24"><ellipse cx="12" cy="13" rx="9" ry="6"/><path d="M5 13c1-4 3.5-7 7-7s6 3 7 7"/><circle cx="12" cy="13" r="3"/></svg></div>
+          <h3>Korean Lash Lift</h3>
+          <p>Consultation, health check &amp; consent form</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- â•â•â•â•â•â•â•â•â•â•â• STEP 1: MEDICAL HEALTH FORM â•â•â•â•â•â•â•â•â•â•â• -->
+    <div class="form-section active" id="step1">
+      <div class="section-header">
+        <h1 class="section-title">Medical Health Form</h1>
+        <p class="section-subtitle">Please indicate if you have experienced or currently have any of the following conditions.</p>
+      </div>
+
+      <!-- Client Info -->
+      <div class="form-card">
+        <div class="card-title">Client Information</div>
+        <div class="field-row" style="margin-bottom:16px">
+          <div class="field-group">
+            <label class="field-label">Full Name</label>
+            <input type="text" class="field-input" id="clientName" placeholder="Enter full name" autocomplete="name">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Date</label>
+            <input type="date" class="field-input" id="formDate">
+          </div>
+        </div>
+      </div>
+
+      <!-- Medical Conditions -->
+      <div class="form-card">
+        <div class="card-title">Medical Conditions</div>
+        <div class="toggle-grid" id="medicalConditions">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="form-card">
+        <div class="card-title">Details</div>
+        <div class="field-group">
+          <label class="field-label">If you answered yes to any of the above, please provide details</label>
+          <textarea class="field-input" id="medicalDetails" placeholder="Please provide details for any conditions marked 'Yes'..."></textarea>
+        </div>
+      </div>
+
+      <!-- Treatments/Procedures -->
+      <div class="form-card">
+        <div class="card-title">Recent Treatments &amp; Procedures</div>
+        <div class="toggle-grid" id="recentTreatments">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Treatment Details -->
+      <div class="form-card">
+        <div class="card-title">Treatment Details</div>
+        <div class="field-group">
+          <label class="field-label">Provide details for any treatments marked 'Yes'</label>
+          <textarea class="field-input" id="treatmentDetails" placeholder="Please provide details..."></textarea>
+        </div>
+      </div>
+
+      <!-- Signatures -->
+      <div class="form-card">
+        <div class="card-title">Declaration</div>
+        <p style="font-size:14px;color:var(--text-light);margin-bottom:20px;line-height:1.6">I have read &amp; fully understand the above information.</p>
+        <div class="field-row">
+          <div class="signature-area">
+            <label class="field-label">Client Signature</label>
+            <div class="signature-pad-wrapper" id="sig1Wrapper">
+              <canvas class="signature-canvas" id="sig1Canvas"></canvas>
+              <div class="signature-placeholder">Tap to sign</div>
+              <div class="signature-line"></div>
+              <button class="signature-clear" onclick="clearSignature('sig1')">Clear</button>
+            </div>
+          </div>
+          <div class="signature-area">
+            <label class="field-label">Technician Signature</label>
+            <div class="signature-pad-wrapper" id="sig2Wrapper">
+              <canvas class="signature-canvas" id="sig2Canvas"></canvas>
+              <div class="signature-placeholder">Tap to sign</div>
+              <div class="signature-line"></div>
+              <button class="signature-clear" onclick="clearSignature('sig2')">Clear</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- â•â•â•â•â•â•â•â•â•â•â• STEP 2: TREATMENT RECORD FORM â•â•â•â•â•â•â•â•â•â•â• -->
+    <div class="form-section" id="step2">
+      <div class="section-header">
+        <h1 class="section-title">Treatment Record</h1>
+        <p class="section-subtitle">Record details of today's treatment session.</p>
+      </div>
+
+      <div class="form-card">
+        <div class="card-title">Treatment Details</div>
+        <div class="field-group">
+          <label class="field-label">Client Name</label>
+          <input type="text" class="field-input" id="trClientName" placeholder="Auto-filled from medical form" readonly>
+        </div>
+        <div class="field-row" style="margin-bottom:16px">
+          <div class="field-group">
+            <label class="field-label">Treatment</label>
+            <input type="text" class="field-input" id="trTreatment" placeholder="e.g. Semi Permanent Eyebrows">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Technique</label>
+            <input type="text" class="field-input" id="trTechnique" placeholder="e.g. Microblading">
+          </div>
+        </div>
+        <div class="field-row" style="margin-bottom:16px">
+          <div class="field-group">
+            <label class="field-label">Fitzpatrick / Skin Type</label>
+            <input type="text" class="field-input" id="trFitzpatrick" placeholder="e.g. Type III">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Needle / Lot No.</label>
+            <input type="text" class="field-input" id="trNeedle" placeholder="Enter needle/lot number">
+          </div>
+        </div>
+        <div class="field-row" style="margin-bottom:16px">
+          <div class="field-group">
+            <label class="field-label">Pigment Used</label>
+            <input type="text" class="field-input" id="trPigment" placeholder="Enter pigment name">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Pigment Blend</label>
+            <input type="text" class="field-input" id="trBlend" placeholder="Enter blend details">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label class="field-label">Duration</label>
+            <input type="text" class="field-input" id="trDuration" placeholder="e.g. 2 hours">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Cost</label>
+            <input type="text" class="field-input" id="trCost" placeholder="e.g. Â£350">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="card-title">Comments</div>
+        <div class="field-group">
+          <textarea class="field-input" id="trComments" placeholder="Any notes about the treatment..." style="min-height:160px"></textarea>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="card-title">Sign Off</div>
+        <div class="field-group">
+          <label class="field-label">Treatment Date</label>
+          <input type="date" class="field-input" id="trDate">
+        </div>
+        <div class="field-row" style="margin-top:16px">
+          <div class="signature-area">
+            <label class="field-label">Technician Signature</label>
+            <div class="signature-pad-wrapper" id="sig3Wrapper">
+              <canvas class="signature-canvas" id="sig3Canvas"></canvas>
+              <div class="signature-placeholder">Tap to sign</div>
+              <div class="signature-line"></div>
+              <button class="signature-clear" onclick="clearSignature('sig3')">Clear</button>
+            </div>
+          </div>
+          <div class="signature-area">
+            <label class="field-label">Client Signature</label>
+            <div class="signature-pad-wrapper" id="sig4Wrapper">
+              <canvas class="signature-canvas" id="sig4Canvas"></canvas>
+              <div class="signature-placeholder">Tap to sign</div>
+              <div class="signature-line"></div>
+              <button class="signature-clear" onclick="clearSignature('sig4')">Clear</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- â•â•â•â•â•â•â•â•â•â•â• STEP 3: CONSENT FORM â•â•â•â•â•â•â•â•â•â•â• -->
+    <div class="form-section" id="step3">
+      <div class="section-header">
+        <h1 class="section-title">Consent Form</h1>
+        <p class="section-subtitle">Procedure â€” Semi Permanent Eyebrows. Please read and initial each item.</p>
+      </div>
+
+      <!-- Personal Details -->
+      <div class="form-card">
+        <div class="card-title">Personal Details</div>
+        <div class="field-row" style="margin-bottom:16px">
+          <div class="field-group">
+            <label class="field-label">Full Name</label>
+            <input type="text" class="field-input" id="consentName" placeholder="Auto-filled" readonly>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Date of Birth</label>
+            <input type="date" class="field-input" id="consentDOB">
+          </div>
+        </div>
+        <div class="field-group" style="margin-bottom:16px">
+          <label class="field-label">Address</label>
+          <input type="text" class="field-input" id="consentAddress" placeholder="Full address">
+        </div>
+        <div class="field-row-3" style="margin-bottom:16px">
+          <div class="field-group">
+            <label class="field-label">Postcode</label>
+            <input type="text" class="field-input" id="consentPostcode" placeholder="Postcode">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Mobile</label>
+            <input type="tel" class="field-input" id="consentPhone" placeholder="Phone number">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Email</label>
+            <input type="email" class="field-input" id="consentEmail" placeholder="Email address">
+          </div>
+        </div>
+      </div>
+
+      <!-- Informed Consent -->
+      <div class="form-card">
+        <div class="card-title">Informed Consent</div>
+        <p style="font-size:13px;color:var(--text-light);margin-bottom:20px;line-height:1.7">
+          The nature &amp; method of the proposed Permanent-Makeup (tattoo) procedure has been explained to me as having the usual inherent risks and the possibility of complications during and following its performance. I understand there may be a certain amount of discomfort or pain associated with the procedure and that other adverse side effects may include minor or temporary bleeding, bruising, redness or other discolouration &amp; swelling. Fading and loss of pigment may occur. Secondary infection in the area of the procedure may occur, however, if properly cared for is very rare.
+        </p>
+        <div class="consent-list" id="consentItems">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Patch Test -->
+      <div class="form-card">
+        <div class="card-title">Patch Test &amp; Anaesthetic</div>
+        <div class="consent-list" id="patchTestItems">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Skin Type Considerations -->
+      <div class="form-card">
+        <div class="card-title">Skin Type &amp; Results</div>
+        <div class="consent-list" id="skinTypeItems">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Additional Acknowledgements -->
+      <div class="form-card">
+        <div class="card-title">Additional Acknowledgements</div>
+        <div class="consent-list" id="additionalItems">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Pregnancy Question -->
+      <div class="form-card">
+        <div class="card-title">Pregnancy Status</div>
+        <div class="field-group">
+          <label class="field-label">Are you pregnant, nursing or trying (IVF) to get pregnant?</label>
+          <div class="radio-group" id="pregnancyRadio">
+            <div class="radio-option" onclick="selectRadio(this, 'pregnancy', 'Yes')">
+              <input type="radio" name="pregnancy" value="Yes"> Yes
+            </div>
+            <div class="radio-option" onclick="selectRadio(this, 'pregnancy', 'No')">
+              <input type="radio" name="pregnancy" value="No"> No
+            </div>
+            <div class="radio-option" onclick="selectRadio(this, 'pregnancy', 'DontKnow')">
+              <input type="radio" name="pregnancy" value="DontKnow"> Don't Know
+            </div>
+          </div>
+          <p style="font-size:12px;color:var(--error);margin-top:8px">If "Don't Know" is selected, services will not be performed.</p>
+        </div>
+      </div>
+
+      <!-- Allergies & Medications -->
+      <div class="form-card">
+        <div class="card-title">Allergies &amp; Medications</div>
+        <div class="field-group">
+          <label class="field-label">Please list any known allergies and medications taken in the past 12 months</label>
+          <textarea class="field-input" id="allergiesMeds" placeholder="List allergies and medications..."></textarea>
+        </div>
+      </div>
+
+      <!-- Final Declaration & Signatures -->
+      <div class="form-card">
+        <div class="card-title">Final Declaration</div>
+        <div class="consent-list">
+          <div class="consent-item" onclick="toggleConsent(this)">
+            <div class="consent-check">
+              <svg width="14" height="14" fill="none" stroke="white" stroke-width="2.5"><polyline points="2,7 6,11 12,3"/></svg>
+            </div>
+            <span class="consent-text">I have read and fully understand the contents of each paragraph above. I acknowledge this is a legal &amp; binding contract and that I have received no warranties or guarantees with respect to the benefits to be realised from or consequences of the aforementioned procedure(s). I was of sound mind and capable of making independent decisions for myself.</span>
+            <input type="checkbox" name="finalDeclaration">
+          </div>
+        </div>
+        <div class="field-row" style="margin-top:20px">
+          <div class="signature-area">
+            <label class="field-label">Client Signature</label>
+            <div class="signature-pad-wrapper" id="sig5Wrapper">
+              <canvas class="signature-canvas" id="sig5Canvas"></canvas>
+              <div class="signature-placeholder">Tap to sign</div>
+              <div class="signature-line"></div>
+              <button class="signature-clear" onclick="clearSignature('sig5')">Clear</button>
+            </div>
+          </div>
+          <div class="signature-area">
+            <label class="field-label">Technician Signature</label>
+            <div class="signature-pad-wrapper" id="sig6Wrapper">
+              <canvas class="signature-canvas" id="sig6Canvas"></canvas>
+              <div class="signature-placeholder">Tap to sign</div>
+              <div class="signature-line"></div>
+              <button class="signature-clear" onclick="clearSignature('sig6')">Clear</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- LASH LIFT STEP 1: PERSONAL DETAILS -->
+    <div class="form-section" id="ll1">
+      <div class="section-header">
+        <h1 class="section-title">Treatment Consultation</h1>
+        <p class="section-subtitle">Korean Lash Lift — Please complete all sections.</p>
+      </div>
+      <div class="form-card">
+        <div class="card-title">Personal Details</div>
+        <div class="field-group">
+          <label class="field-label">Full Name</label>
+          <input type="text" class="field-input" id="llClientName" placeholder="Enter full name" autocomplete="name">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Address</label>
+          <input type="text" class="field-input" id="llAddress" placeholder="Full address">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Date of Birth</label>
+          <div class="field-row-3">
+            <select class="field-input" id="llDobDay"></select>
+            <select class="field-input" id="llDobMonth"></select>
+            <select class="field-input" id="llDobYear"></select>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Contact Number</label>
+          <input type="tel" class="field-input" id="llPhone" placeholder="Phone number" autocomplete="tel">
+        </div>
+      </div>
+    </div>
+
+    <!-- LASH LIFT STEP 2: HEALTH & CONDITIONS -->
+    <div class="form-section" id="ll2">
+      <div class="section-header">
+        <h1 class="section-title">Health &amp; Conditions</h1>
+        <p class="section-subtitle">Do you have any of the following? Please toggle any that apply.</p>
+      </div>
+      <div class="form-card">
+        <div class="card-title">Medical Conditions</div>
+        <div class="toggle-grid" id="llConditionsGrid"></div>
+      </div>
+      <div class="form-card">
+        <div class="card-title">Details &amp; Medications</div>
+        <p style="font-size:13px;color:var(--text-light);margin-bottom:16px;line-height:1.6">This list is not exhaustive — please inform the therapist if there is anything else. Give details of any of the above, and list any medications. If none, write N/A.</p>
+        <div class="field-group">
+          <label class="field-label">Please give details &amp; list any medications</label>
+          <textarea class="field-input" id="llMedDetails" placeholder="If none, write N/A"></textarea>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="card-title">Retinol Use</div>
+        <div class="field-group">
+          <label class="field-label">Are you using Retinol on your face (in your skincare)?</label>
+          <div class="radio-group">
+            <div class="radio-option" onclick="selectRadio(this, 'llRetinol', 'Yes')"><input type="radio" name="llRetinol" value="Yes"> Yes</div>
+            <div class="radio-option" onclick="selectRadio(this, 'llRetinol', 'No')"><input type="radio" name="llRetinol" value="No"> No</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LASH LIFT STEP 3: DECLARATION & CONSENT -->
+    <div class="form-section" id="ll3">
+      <div class="section-header">
+        <h1 class="section-title">Declaration &amp; Consent</h1>
+        <p class="section-subtitle">Please read carefully before signing.</p>
+      </div>
+      <div class="form-card">
+        <div class="card-title">Client Declaration</div>
+        <div class="consent-item" onclick="toggleConsent(this)">
+          <div class="consent-check"><svg width="14" height="14" fill="none" stroke="white" stroke-width="2.5"><polyline points="2,7 6,11 12,3"/></svg></div>
+          <span class="consent-text">I confirm a patch test has been performed (if required) with no adverse reaction, and the information above is correct to my knowledge. I am not aware of any reasons why the treatment should not be performed. I am aware that even though a patch test has been carried out, reactions can occur/develop at any time and this is not a guarantee that a reaction will never take place. I therefore release my technician/trainer of any responsibility in the event a reaction does occur. I agree to follow the aftercare I have been given.</span>
+          <input type="checkbox" name="llDeclaration">
+        </div>
+        <div style="margin-top:20px">
+          <div class="signature-area">
+            <label class="field-label">Client Signature</label>
+            <div class="signature-pad-wrapper" id="sig7Wrapper">
+              <canvas class="signature-canvas" id="sig7Canvas"></canvas>
+              <div class="signature-placeholder">Tap to sign</div>
+              <div class="signature-line"></div>
+              <button class="signature-clear" onclick="clearSignature('sig7')">Clear</button>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:20px">
+          <label class="field-label">Client Signature Date</label>
+          <div class="field-row-3">
+            <select class="field-input" id="llSigDay"></select>
+            <select class="field-input" id="llSigMonth"></select>
+            <select class="field-input" id="llSigYear"></select>
+          </div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="card-title"><svg width="18" height="18" fill="none" stroke="var(--brand)" stroke-width="2" style="vertical-align:-3px;margin-right:6px"><rect x="1" y="3" width="16" height="12" rx="2"/><path d="M1 3l8 6 8-6"/></svg>Keep Updated with Offers/News?</div>
+        <p style="font-size:13px;color:var(--text-light);margin-bottom:16px;line-height:1.6">Can we contact you regarding appointments? Pictures taken will only be used by the salon and we will ask for prior consent. If you agree please select Yes.</p>
+        <div class="radio-group">
+          <div class="radio-option" onclick="selectRadio(this, 'llMarketing', 'Yes')"><input type="radio" name="llMarketing" value="Yes"> Yes</div>
+          <div class="radio-option" onclick="selectRadio(this, 'llMarketing', 'No')"><input type="radio" name="llMarketing" value="No"> No</div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="card-title"><svg width="18" height="18" fill="none" stroke="var(--brand)" stroke-width="2" style="vertical-align:-3px;margin-right:6px"><rect x="3" y="5" width="12" height="13" rx="1"/><path d="M7 1v4M11 1v4M7 10h4M7 13h2"/></svg>GDPR</div>
+        <div class="gdpr-text">
+          <p style="margin-bottom:10px">I am collecting the data on the client consultation forms to ensure that I can safely perform your treatment &amp; to be able to contact you with regards to appointments/marketing. I need to store this data to comply with my public &amp; product liability insurance &amp; to be able to safely continue treatments &amp; keep records of all products used should any issues/allergies/problems arise.</p>
+          <p style="margin-bottom:10px">I will store this data in a secure location Ovatu. You can request to see a copy of this data by writing to <strong>no.1lashandbrowstudio@yahoo.com</strong></p>
+          <p style="margin-bottom:10px">When taking card payments I use a third party Izettle, where only your name &amp; last 4 digits of your card are stored. I collect this data so that I can complete my accounts accordingly for HMRC. This data is not shared with anyone and is on a secure device.</p>
+          <p style="margin-bottom:10px">We are now digital on all forms, these will collect the same data as the paper forms &amp; will be stored on the secure Ovatu booking system. My iPad is password protected.</p>
+          <p style="margin-bottom:10px">I will store ALL necessary data for 7 years to comply with my legal obligations but it will be reviewed on a yearly basis where you can opt out. If you choose to opt out, I will have to keep your data on file for insurance/account purposes. You can opt out at any time by contacting me in writing to <strong>no.1lashandbrowstudio@yahoo.com</strong></p>
+          <p style="margin-bottom:10px">If you decide to opt out &amp; withdraw consent I will no longer be able to perform treatments on you.</p>
+          <p>Consent to contact you regarding appointments and marketing. Consent to have pictures taken of your eyelashes to be used on my social media platforms (Facebook, Twitter, website, Instagram).</p>
+        </div>
+      </div>
+    </div>
+
+
+  </main>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav form-nav-hidden" id="bottomNav">
+    <button class="btn btn-secondary" id="btnPrev" onclick="prevStep()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L4 8l6 5"/></svg>
+      Previous
+    </button>
+    <span style="font-size:13px;color:var(--text-muted)" id="stepCount">Step 1 of 3</span>
+    <button class="btn btn-primary" id="btnNext" onclick="nextStep()">
+      Next
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l6 5-6 5"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- â•â•â• SUCCESS MODAL â•â•â• -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal">
+    <div class="modal-icon success">
+      <svg width="32" height="32" fill="none" stroke="#5A8A6A" stroke-width="2.5"><polyline points="8,16 14,22 24,10"/></svg>
+    </div>
+    <h3 class="modal-title">Forms Complete!</h3>
+    <p class="modal-text" id="modalText">PDF has been generated successfully.</p>
+    <div class="modal-actions" style="flex-wrap:wrap;gap:10px">
+      <button class="btn btn-primary" onclick="emailPDFToCharlotte()" id="emailToCharlotteBtn" style="flex:1;min-width:180px;display:none">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;margin-right:4px"><rect x="1" y="3" width="14" height="10" rx="2"/><path d="M1 3l7 5 7-5"/></svg>
+        Email PDF to Charlotte
+      </button>
+      <button class="btn btn-secondary" onclick="downloadLastPDF()" id="downloadPDFBtn" style="flex:1;min-width:120px">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;margin-right:4px"><path d="M8 2v10M4 8l4 4 4-4"/><path d="M2 14h12"/></svg>
+        Download PDF
+      </button>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:10px;justify-content:center">
+      <button class="btn btn-secondary" onclick="closeModal()" style="font-size:13px">Close</button>
+      <button class="btn btn-success" onclick="resetAll(); closeModal()" style="font-size:13px">New Client</button>
+    </div>
+  </div>
+</div>
+
+<!-- â•â•â• SHARE / EMAIL MODAL â•â•â• -->
+<div class="modal-overlay" id="shareModal" onclick="if(event.target===this)closeShareModal()">
+  <div class="modal" style="text-align:left; max-width:480px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3 class="modal-title" style="margin:0">Share Form</h3>
+      <button class="btn btn-secondary btn-icon" onclick="closeShareModal()" style="flex-shrink:0">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l10 10M14 4L4 14"/></svg>
+      </button>
+    </div>
+
+    <!-- Tab buttons -->
+    <div style="display:flex;gap:8px;margin-bottom:20px">
+      <button class="btn btn-secondary share-tab active" id="tabEmail" onclick="switchShareTab('email')" style="flex:1;font-size:13px">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;margin-right:4px"><rect x="1" y="3" width="14" height="10" rx="2"/><path d="M1 3l7 5 7-5"/></svg>
+        Email to Client
+      </button>
+      <button class="btn btn-secondary share-tab" id="tabLink" onclick="switchShareTab('link')" style="flex:1;font-size:13px">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;margin-right:4px"><path d="M7 10l-1 1a3 3 0 1 1-4-4l1-1"/><path d="M9 6l1-1a3 3 0 1 1 4 4l-1 1"/><path d="M6 10l4-4"/></svg>
+        Copy Link
+      </button>
+    </div>
+
+    <!-- Email tab -->
+    <div id="shareEmailTab">
+      <div class="field-group" style="margin-bottom:12px">
+        <label class="field-label">Client's Email Address</label>
+        <input type="email" class="field-input" id="shareEmail" placeholder="client@example.com" autocomplete="email">
+      </div>
+      <div class="field-group" style="margin-bottom:12px">
+        <label class="field-label">Client Name (optional)</label>
+        <input type="text" class="field-input" id="shareClientName" placeholder="Client's first name">
+      </div>
+      <div class="field-group" style="margin-bottom:16px">
+        <label class="field-label">Personal Message (optional)</label>
+        <textarea class="field-input" id="shareMessage" placeholder="Add a note..." style="height:70px"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="sendShareEmail()" style="width:100%">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;margin-right:4px"><path d="M2 3l12 6-12 6V9l8-1-8-1z"/></svg>
+        Open Email Client
+      </button>
+      <p style="font-size:11px;color:var(--text-muted);margin-top:10px;text-align:center;line-height:1.5">
+        This will open your default email app with a pre-filled message containing the form link.
+      </p>
+    </div>
+
+    <!-- Link tab -->
+    <div id="shareLinkTab" style="display:none">
+      <div class="field-group" style="margin-bottom:12px">
+        <label class="field-label">Form Link</label>
+        <div style="display:flex;gap:8px">
+          <input type="text" class="field-input" id="shareLinkInput" readonly style="flex:1;font-size:13px;background:var(--cream-dark)">
+          <button class="btn btn-primary" onclick="copyFormLink()" id="copyLinkBtn" style="white-space:nowrap">Copy</button>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);line-height:1.5">Share this link with your client so they can fill out the forms on their own device. Once completed, they can download the PDF and email it back to you.</p>
+
+      <!-- Native share button (mobile) -->
+      <button class="btn btn-secondary" onclick="nativeShare()" id="nativeShareBtn" style="width:100%;margin-top:12px;display:none">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;margin-right:4px"><path d="M8 2v10M4 6l4-4 4 4"/><path d="M14 10v4H2v-4"/></svg>
+        Share via...
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- â•â•â• SETTINGS PANEL â•â•â• -->
+<div class="settings-panel" id="settingsPanel">
+  <div style="max-width:600px;margin:0 auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:32px">
+      <h2 class="section-title">Settings</h2>
+      <button class="btn btn-secondary" onclick="hideSettings()">Done</button>
+    </div>
+
+    <!-- EMAIL SETTINGS (Simple) -->
+    <div class="form-card">
+      <div class="card-title">
+        <svg width="18" height="18" fill="none" stroke="var(--brand)" stroke-width="2" style="vertical-align:-3px;margin-right:6px"><rect x="1" y="3" width="16" height="12" rx="2"/><path d="M1 3l8 6 8-6"/></svg>
+        Email Delivery
+      </div>
+      <p style="font-size:13px;color:var(--text-light);margin-bottom:16px;line-height:1.6">
+        Enter your email address below. When a client completes their forms, they'll be able to email the PDF directly to you. This is the simplest option â€” no extra setup needed.
+      </p>
+      <div class="field-group">
+        <label class="field-label">Your Email Address</label>
+        <input type="email" class="field-input" id="charlotteEmail" placeholder="charlotte@example.com" autocomplete="email">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Your Name (shown on email button)</label>
+        <input type="text" class="field-input" id="charlotteName" placeholder="Charlotte" value="Charlotte">
+      </div>
+      <button class="btn btn-primary" onclick="saveSettings()" style="margin-top:8px">Save</button>
+      <p style="font-size:11px;color:var(--text-muted);margin-top:10px;line-height:1.5">
+        After submitting forms, clients will see an "Email PDF to Charlotte" button that opens their email app with your address pre-filled. They attach the downloaded PDF and send.
+      </p>
+    </div>
+
+    <!-- GOOGLE DRIVE (Advanced) -->
+    <div class="form-card" style="margin-top:16px">
+      <div class="card-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2" style="vertical-align:-3px;margin-right:6px"><path d="M12 2L2 19h20L12 2z"/></svg>
+        Google Drive (Advanced)
+      </div>
+      <p style="font-size:13px;color:var(--text-light);margin-bottom:16px;line-height:1.6">
+        Optionally connect Google Drive to automatically save completed forms as PDFs to a folder. This requires a one-time technical setup.
+      </p>
+      <div class="field-group">
+        <label class="field-label">Client ID</label>
+        <input type="text" class="field-input" id="gdriveClientId" placeholder="Enter your Google OAuth Client ID">
+      </div>
+      <div class="field-group">
+        <label class="field-label">API Key</label>
+        <input type="text" class="field-input" id="gdriveApiKey" placeholder="Enter your Google API Key">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Folder ID (optional)</label>
+        <input type="text" class="field-input" id="gdriveFolderId" placeholder="Google Drive folder ID for saving forms">
+      </div>
+      <button class="btn btn-primary" onclick="saveSettings()" style="margin-top:8px">Save Settings</button>
+      <button class="btn btn-secondary" onclick="testGDriveConnection()" style="margin-top:8px;margin-left:8px">Test Connection</button>
+    </div>
+
+    <div class="form-card" style="margin-top:16px">
+      <div class="card-title">Setup Instructions</div>
+      <div style="font-size:13px;color:var(--text-light);line-height:1.8">
+        <p><strong>1.</strong> Go to <a href="https://console.cloud.google.com" target="_blank" style="color:var(--brand)">Google Cloud Console</a></p>
+        <p><strong>2.</strong> Create a project and enable the Google Drive API</p>
+        <p><strong>3.</strong> Create OAuth 2.0 credentials (Web application type)</p>
+        <p><strong>4.</strong> Add your hosting URL to Authorised JavaScript origins</p>
+        <p><strong>5.</strong> Create an API Key and restrict it to Google Drive API</p>
+        <p><strong>6.</strong> Paste the Client ID and API Key above</p>
+        <p style="margin-top:12px"><strong>Tip:</strong> Create a dedicated folder in Google Drive for client forms and paste its folder ID above.</p>
+      </div>
+    </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// DATA
+const MEDICAL_CONDITIONS = ['Abnormal Heart Condition','Acne','Alcohol Dependency','Alopecia','Anaemia','Artificial Heart Valves or Joints','Blurred Vision','Bruise or Bleed Easily','Cancer','Chapped Lips','Circulatory Problems','Cold Sores (Herpes Simplex)','Dermatitis / Skin Sensitivity','Diabetes','Dry Eyes','Eczema','Epilepsy','Eye Infection','Fainting / Dizziness','Glaucoma','Haemophilia','Hair Loss (recent)','Hay Fever','Healing Problems','Heart Murmur','Hepatitis','High Blood Pressure','HIV or AIDS','Hormonal Changes','Hyper Pigmentation','Hypertension','Hypertrophic Scars','Keloid Scars','Kidney Disease','Liver Disease','Low Blood Pressure','Mitral Valve Prolapse','Palpitations','Psoriasis','Pregnant','Prolonged Bleeding','Protruding / Varicose Veins','Rheumatic Fever','Scar Easily','Seizures','Sensitivity to Cosmetics','Spider Veins (Telangiectasia)','Stomach Ulcers','Stroke','Thyroid Abnormalities','Trichotillomania','Tuberculosis','Tumours, Growths or Cysts','Watery Eyes'];
+const RECENT_TREATMENTS = ['Accutane (within last 6 months)','Cortisone (within last 6 months)','Eyelash/Eyebrow Tint','Eyelid Surgery','Fat Transfer Injections','AHA Preparations (within last 2 weeks)','Other Tattoos','Chemical or Laser Peel (within last 6 months)','Gore-Tex Implants / Silicone Injections','Botulinum Toxin Injections','Pacemaker','Collagen Injections','Contact Lenses','Use of Sun Bed'];
+const CONSENT_ITEMS = ['I acknowledge that it is not reasonably possible to determine whether I might have an allergic reaction to any pigments, dyes, topical anaesthetics, or processes used in the procedure; and I agree to accept the risk that such a reaction is possible.','I acknowledge that complications are always possible as a result of the permanent makeup procedure, particularly in the event that post-procedure instructions are not followed.','I have received a copy of the After Care instructions.','All subsequent procedures (not including the first touch up) are an additional fee.','I realise that my body is unique and the practitioner cannot predict how my skin may react as a result of the procedure.'];
+const PATCH_TEST_ITEMS = ['I have completed a patch test prior to today\'s appointment and suffered no adverse reaction to the products tested.','I declined the offer of a patch test upon booking the appointment.','I require a patch test (requires rescheduling today\'s appointment).','I wish for Charlotte to use topical anaesthetic for the treatment today.','I have never had a reaction to anaesthetic in the past.'];
+const SKIN_TYPE_ITEMS = ['Red heads, blondes & fair skin (Fitz 1-2 skin types) will be red, swollen and pigment MAY not take. Additional procedures may be required to obtain desired results.','Results WILL appear softer as the treated area heals. The area/s treated WILL NOT look as DEFINED or as BOLD as the 1st procedure.','ALL procedures require 2 appointments & colour boosts every 1-2 years to keep the colour fresh.','I acknowledge & understand that if I have oily/severely oily skin the pigment will heal/appear much softer and can look more solid. The pigment WILL fade quicker, look blurred or more solid. I accept these risks.','Frequent tanning & sun exposure WILL heal darker & fade the pigment quicker. It is recommended to NOT have a tan/burn (30 days before/after) on your face at the time of your procedure.','I acknowledge & understand that pigment implanted on darker skin types will appear softer & blend more with your own skin\'s melanin & will not appear as bold or defined as on lighter skin types.','Alopecia clients \u2014 Due to the change in skin texture, pigments may heal more powdered.'];
+const ADDITIONAL_ITEMS = ['I acknowledge that the procedure will result in a permanent change to my appearance and that no representations have been made to me as to later change or remove the result.','I understand that skin altering procedures, such as plastic surgery, impacts and/or injections may alter and degrade my permanent make-up. Such changes are not the fault of the practitioner.','Thyroid conditions & Medicines WILL prevent the pigment from retaining, fade quickly or change in colour. I accept these risks. I have not used skin changing medication in the past 12 months.','I ACKNOWLEDGE THAT NO GUARANTEES HAVE BEEN MADE TO ME CONCERNING THE RESULTS OF THIS PROCEDURE AND THAT THE PROFESSIONAL RECOMMENDATION IS A NATURAL LOOK.','I accept responsibility for determining the colour, shape & position of the brows that will be applied. The actual colour of the pigment may be modified slightly due to my skin tone.','I acknowledge that the obtaining of Permanent Make-up procedure(s) is by my choice alone, and I consent to application of the procedure and accept the risks.','When you leave today, the hair strokes are intact. How your body heals them is out of the control of the technician. Even when following aftercare, fading, blurring or poor retention can still happen.','If you have had tattoo removal prior to seeing Charlotte, due to scar tissue the pigment may not retain. Further procedures may not be an option and there are NO REFUNDS.','If any other technician applies permanent makeup over an area originally done by Charlotte, she will no longer perform future treatments.','In the event of a CAT or MRI scan, please inform your physician of your Iron Oxide Permanent Cosmetics as some pulling or burning sensation (rare) may occur.','Permanent Makeup is an ART, NOT a science. Results will vary and using a pencil or powder may still be needed. Touch ups will not be done sooner than the time recommended by the technician.','I understand that if I do not abide by strict after care, I can ruin my results. The After Care is crucial for optimum pigment retention.','Absolutely no refunds after services have been performed.'];
+const LL_CONDITIONS = ['Cataract','Conjunctivitis','Cancer','Undergoing chemotherapy','Diabetic retinopathy','Dry eye syndrome','Glaucoma','Contagious or infectious disease','Taking any drugs or medication','Using products containing Retin-A, AHA/BHA','Pregnant','Breastfeeding','Asthma','Hyper sensitive skin','Sunburn or windburn','Any skin conditions','Wear contact lenses','Any allergies','Eye problems in the last 4 weeks','Use any eye products','Taking skin thinning medication (e.g. Roaccutane)','PPD allergies','Hair dye allergies','Tint allergy','Reactions to previous treatments','Symptoms of COVID-19','Been in contact with anyone with symptoms or positive test'];
+
+// STATE
+let currentStep = 1;
+let currentTreatment = null;
+const signatures = {};
+
+// INIT
+document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('formDate').value = today;
+  document.getElementById('trDate').value = today;
+  buildToggles('medicalConditions', MEDICAL_CONDITIONS);
+  buildToggles('recentTreatments', RECENT_TREATMENTS);
+  buildConsentList('consentItems', CONSENT_ITEMS);
+  buildConsentList('patchTestItems', PATCH_TEST_ITEMS);
+  buildConsentList('skinTypeItems', SKIN_TYPE_ITEMS);
+  buildConsentList('additionalItems', ADDITIONAL_ITEMS);
+  buildToggles('llConditionsGrid', LL_CONDITIONS);
+  populateDateSelects('llDob');
+  populateDateSelects('llSig', true);
+  ['sig1','sig2','sig3','sig4','sig5','sig6','sig7'].forEach(initSignaturePad);
+  document.getElementById('clientName').addEventListener('input', (e) => {
+    document.getElementById('trClientName').value = e.target.value;
+    document.getElementById('consentName').value = e.target.value;
+  });
+  loadSettings();
+  setTimeout(() => {
+    const splash = document.getElementById('splash');
+    const app = document.getElementById('app');
+    if (splash) { splash.classList.add('fade-out'); setTimeout(() => splash.style.display = 'none', 800); }
+    if (app) app.classList.add('visible');
+  }, 1500);
+});
+
+function populateDateSelects(prefix, setToday) {
+  const d = document.getElementById(prefix+'Day'), m = document.getElementById(prefix+'Month'), y = document.getElementById(prefix+'Year');
+  d.innerHTML = '<option value="">Day</option>';
+  for (let i=1;i<=31;i++) d.innerHTML += '<option value="'+i+'">'+i+'</option>';
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  m.innerHTML = '<option value="">Month</option>';
+  months.forEach((mn,i) => m.innerHTML += '<option value="'+(i+1)+'">'+mn+'</option>');
+  y.innerHTML = '<option value="">Year</option>';
+  for (let i=2028;i>=1907;i--) y.innerHTML += '<option value="'+i+'">'+i+'</option>';
+  if (setToday) { const now = new Date(); d.value = now.getDate(); m.value = now.getMonth()+1; y.value = now.getFullYear(); }
+}
+
+// TREATMENT SELECTOR
+function selectTreatment(type) {
+  currentTreatment = type; currentStep = 1;
+  document.getElementById('treatmentSelector').style.display = 'none';
+  document.getElementById('stepsNav').classList.remove('form-nav-hidden');
+  document.getElementById('stepLabel').classList.remove('form-nav-hidden');
+  document.getElementById('bottomNav').classList.remove('form-nav-hidden');
+  document.querySelector('.header-title').textContent = type === 'eyebrows' ? 'Eyebrow Forms' : 'Korean Lash Lift';
+  goToStep(1);
+}
+function backToSelector() {
+  currentTreatment = null;
+  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('treatmentSelector').style.display = '';
+  document.getElementById('stepsNav').classList.add('form-nav-hidden');
+  document.getElementById('stepLabel').classList.add('form-nav-hidden');
+  document.getElementById('bottomNav').classList.add('form-nav-hidden');
+  document.getElementById('progressFill').style.width = '0%';
+  document.querySelector('.header-title').textContent = 'Client Forms';
+}
+
+// BUILDERS
+function buildToggles(cid, items) { document.getElementById(cid).innerHTML = items.map((item, i) => '<div class="toggle-item" onclick="toggleYesNo(this)"><span class="toggle-label">'+item+'</span><label class="toggle-switch" onclick="event.stopPropagation()"><input type="checkbox" name="'+cid+'_'+i+'" onchange="this.closest(\'.toggle-item\').classList.toggle(\'yes\', this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>').join(''); }
+function toggleYesNo(el) { const i = el.querySelector('input[type=checkbox]'); i.checked = !i.checked; el.classList.toggle('yes', i.checked); }
+function buildConsentList(cid, items) { document.getElementById(cid).innerHTML = items.map((text, i) => '<div class="consent-item" onclick="toggleConsent(this)"><div class="consent-check"><svg width="14" height="14" fill="none" stroke="white" stroke-width="2.5"><polyline points="2,7 6,11 12,3"/></svg></div><span class="consent-text">'+text+'</span><input type="checkbox" name="'+cid+'_'+i+'"></div>').join(''); }
+function toggleConsent(el) { const i = el.querySelector('input[type=checkbox]'); i.checked = !i.checked; el.classList.toggle('checked', i.checked); }
+function selectRadio(el, name, value) { document.querySelectorAll('input[name="'+name+'"]').forEach(inp => inp.closest('.radio-option').classList.remove('selected')); el.classList.add('selected'); el.querySelector('input').checked = true; }
+
+// NAVIGATION
+function getStepIds() { return currentTreatment === 'lashlift' ? ['ll1','ll2','ll3'] : ['step1','step2','step3']; }
+function getStepLabels() { return currentTreatment === 'lashlift' ? ['Personal Details','Health & Conditions','Declaration & Consent'] : ['Medical Health Form','Treatment Record','Consent Form']; }
+
+function goToStep(step) {
+  const ids = getStepIds(), labels = getStepLabels();
+  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+  document.getElementById(ids[step-1]).classList.add('active');
+  document.querySelectorAll('.step-dot').forEach((dot,i) => { dot.classList.remove('active','completed'); if(i+1<step) dot.classList.add('completed'); if(i+1===step) dot.classList.add('active'); });
+  document.getElementById('stepLabel').textContent = labels[step-1];
+  document.getElementById('progressFill').style.width = (step/3*100)+'%';
+  document.getElementById('stepCount').textContent = 'Step '+step+' of 3';
+  document.getElementById('btnPrev').style.visibility = step===1?'hidden':'visible';
+  const btn = document.getElementById('btnNext');
+  if(step===3) { btn.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M8 3l5 5-5 5"/></svg> Save & Submit'; btn.classList.remove('btn-primary'); btn.classList.add('btn-success'); }
+  else { btn.innerHTML = 'Next <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l6 5-6 5"/></svg>'; btn.classList.add('btn-primary'); btn.classList.remove('btn-success'); }
+  currentStep = step;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function nextStep() { if(currentStep<3) goToStep(currentStep+1); else submitForms(); }
+function prevStep() { if(currentStep>1) goToStep(currentStep-1); }
+
+// SIGNATURE PAD
+function initSignaturePad(id) {
+  const canvas = document.getElementById(id+'Canvas'), wrapper = document.getElementById(id+'Wrapper');
+  if(!canvas||!wrapper) return;
+  const ctx = canvas.getContext('2d'); let drawing=false, hasContent=false, lastPoint=null;
+  canvas.style.touchAction='none'; canvas.style.webkitTouchCallout='none'; canvas.style.webkitUserSelect='none'; canvas.style.userSelect='none'; wrapper.style.touchAction='none';
+  function resize() { const saved=hasContent?canvas.toDataURL():null; const rect=canvas.getBoundingClientRect(); const dpr=window.devicePixelRatio||1; canvas.width=rect.width*dpr; canvas.height=rect.height*dpr; ctx.scale(dpr,dpr); ctx.strokeStyle='#2C1E14'; ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.lineJoin='round'; if(saved&&hasContent){const img=new Image();img.onload=()=>ctx.drawImage(img,0,0,rect.width,rect.height);img.src=saved;} }
+  resize(); window.addEventListener('resize',resize);
+  function getPos(e){const rect=canvas.getBoundingClientRect();let cx,cy;if(e.touches&&e.touches.length>0){cx=e.touches[0].clientX;cy=e.touches[0].clientY;}else if(e.changedTouches&&e.changedTouches.length>0){cx=e.changedTouches[0].clientX;cy=e.changedTouches[0].clientY;}else{cx=e.clientX;cy=e.clientY;}return{x:cx-rect.left,y:cy-rect.top};}
+  function startDraw(e){e.preventDefault();e.stopPropagation();drawing=true;const p=getPos(e);lastPoint=p;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.arc(p.x,p.y,0.5,0,Math.PI*2);ctx.fill();}
+  function moveDraw(e){if(!drawing)return;e.preventDefault();e.stopPropagation();const p=getPos(e);if(lastPoint){const mx=(lastPoint.x+p.x)/2,my=(lastPoint.y+p.y)/2;ctx.quadraticCurveTo(lastPoint.x,lastPoint.y,mx,my);ctx.stroke();ctx.beginPath();ctx.moveTo(mx,my);}lastPoint=p;if(!hasContent){hasContent=true;wrapper.classList.add('has-signature');}}
+  function endDraw(e){if(drawing){if(e){e.preventDefault();e.stopPropagation();}if(lastPoint){ctx.lineTo(lastPoint.x,lastPoint.y);ctx.stroke();}drawing=false;lastPoint=null;}}
+  canvas.addEventListener('touchstart',startDraw,{passive:false});canvas.addEventListener('touchmove',moveDraw,{passive:false});canvas.addEventListener('touchend',endDraw,{passive:false});canvas.addEventListener('touchcancel',endDraw,{passive:false});
+  canvas.addEventListener('mousedown',startDraw,{passive:false});canvas.addEventListener('mousemove',moveDraw,{passive:false});canvas.addEventListener('mouseup',endDraw,{passive:false});canvas.addEventListener('mouseleave',endDraw,{passive:false});
+  document.body.addEventListener('touchmove',function(e){if(e.target===canvas)e.preventDefault();},{passive:false});
+  signatures[id]={canvas,ctx,wrapper,clear(){const rect=canvas.getBoundingClientRect();const dpr=window.devicePixelRatio||1;ctx.clearRect(0,0,rect.width*dpr,rect.height*dpr);hasContent=false;wrapper.classList.remove('has-signature');ctx.strokeStyle='#2C1E14';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.lineJoin='round';},hasContent(){return hasContent;},toDataURL(){return canvas.toDataURL('image/png');}};
+}
+function clearSignature(id){signatures[id].clear();}
+
+// PDF — EYEBROWS
+function generateEyebrowPDF(){const{jsPDF}=window.jspdf;const doc=new jsPDF('p','mm','a4');const pw=210,m=20,cw=pw-m*2;let y=20;
+function hdr(t){doc.setFillColor(74,55,40);doc.rect(0,0,pw,35,'F');doc.setTextColor(255,255,255);doc.setFontSize(20);doc.text('refine. by Charlotte',m,18);doc.setFontSize(12);doc.text(t,m,28);doc.setTextColor(44,30,20);y=45;}
+function fld(l,v){if(y>270){doc.addPage();y=20;}doc.setFontSize(8);doc.setTextColor(122,107,96);doc.text(l.toUpperCase(),m,y);doc.setFontSize(11);doc.setTextColor(44,30,20);doc.text(String(v||'\u2014'),m,y+5);y+=12;}
+function sec(t){if(y>255){doc.addPage();y=20;}y+=4;doc.setFontSize(12);doc.setTextColor(74,55,40);doc.text(t,m,y);doc.setDrawColor(224,216,208);doc.line(m,y+2,pw-m,y+2);y+=8;}
+function tog(cid,items){const c=document.getElementById(cid);const chks=c.querySelectorAll('input[type=checkbox]');const yes=[];chks.forEach((ck,i)=>{if(ck.checked)yes.push(items[i]);});if(yes.length===0){doc.setFontSize(9);doc.setTextColor(122,107,96);doc.text('None reported',m,y);y+=6;}else{yes.forEach(item=>{if(y>275){doc.addPage();y=20;}doc.setFontSize(9);doc.setTextColor(184,84,80);doc.text('YES \u2014 '+item,m,y,{maxWidth:cw});y+=Math.ceil(doc.getTextDimensions(item,{maxWidth:cw}).h)+4;});}}
+function sig(id,l){if(y>240){doc.addPage();y=20;}doc.setFontSize(8);doc.setTextColor(122,107,96);doc.text(l,m,y);y+=3;if(signatures[id]&&signatures[id].hasContent()){try{doc.addImage(signatures[id].toDataURL(),'PNG',m,y,60,25);y+=28;}catch(e){y+=5;}}else{doc.setDrawColor(200,200,200);doc.line(m,y+10,m+60,y+10);y+=15;}}
+hdr('Medical Health Form');fld('Client Name',document.getElementById('clientName').value);fld('Date',document.getElementById('formDate').value);
+sec('Medical Conditions');tog('medicalConditions',MEDICAL_CONDITIONS);
+sec('Details');doc.setFontSize(9);doc.setTextColor(44,30,20);doc.text(document.getElementById('medicalDetails').value||'None provided',m,y,{maxWidth:cw});y+=8;
+sec('Recent Treatments');tog('recentTreatments',RECENT_TREATMENTS);
+sec('Treatment Details');doc.text(document.getElementById('treatmentDetails').value||'None provided',m,y,{maxWidth:cw});y+=8;
+sec('Signatures');sig('sig1','Client Signature');sig('sig2','Technician Signature');
+doc.addPage();hdr('Treatment Record Form');fld('Client Name',document.getElementById('trClientName').value);fld('Treatment',document.getElementById('trTreatment').value);fld('Technique',document.getElementById('trTechnique').value);fld('Fitzpatrick / Skin Type',document.getElementById('trFitzpatrick').value);fld('Needle / Lot No.',document.getElementById('trNeedle').value);fld('Pigment Used',document.getElementById('trPigment').value);fld('Pigment Blend',document.getElementById('trBlend').value);fld('Duration',document.getElementById('trDuration').value);fld('Cost',document.getElementById('trCost').value);fld('Treatment Date',document.getElementById('trDate').value);
+sec('Comments');doc.setFontSize(9);doc.text(document.getElementById('trComments').value||'None',m,y,{maxWidth:cw});y+=12;sec('Signatures');sig('sig3','Technician Signature');sig('sig4','Client Signature');
+doc.addPage();hdr('Consent Form \u2014 Semi Permanent Eyebrows');fld('Name',document.getElementById('consentName').value);fld('Date of Birth',document.getElementById('consentDOB').value);fld('Address',document.getElementById('consentAddress').value);fld('Postcode',document.getElementById('consentPostcode').value);fld('Mobile',document.getElementById('consentPhone').value);fld('Email',document.getElementById('consentEmail').value);
+sec('Consent Items');const cc=['consentItems','patchTestItems','skinTypeItems','additionalItems'];const ct=[CONSENT_ITEMS,PATCH_TEST_ITEMS,SKIN_TYPE_ITEMS,ADDITIONAL_ITEMS];cc.forEach((cid,ci)=>{document.getElementById(cid).querySelectorAll('input[type=checkbox]').forEach((ck,i)=>{if(y>275){doc.addPage();y=20;}const t=ct[ci][i];const s=t.length>80?t.substring(0,80)+'...':t;doc.setFontSize(8);doc.setTextColor(ck.checked?90:180,ck.checked?138:180,ck.checked?106:180);doc.text((ck.checked?'\u2713 ':'\u25CB ')+s,m,y,{maxWidth:cw});y+=5;});});
+const pr=document.querySelector('input[name="pregnancy"]:checked');fld('Pregnancy Status',pr?pr.value:'Not answered');fld('Allergies & Medications',document.getElementById('allergiesMeds').value);
+sec('Signatures');sig('sig5','Client Signature');sig('sig6','Technician Signature');
+return doc;}
+
+// PDF — LASH LIFT
+function generateLashLiftPDF(){const{jsPDF}=window.jspdf;const doc=new jsPDF('p','mm','a4');const pw=210,m=20,cw=pw-m*2;let y=20;
+function cp(n){if(y+n>275){doc.addPage();y=20;}}
+function hdr(){doc.setFillColor(74,55,40);doc.rect(0,0,pw,35,'F');doc.setTextColor(255,255,255);doc.setFontSize(20);doc.text('refine. by Charlotte',m,18);doc.setFontSize(12);doc.text('Korean Lash Lift \u2014 Treatment Consultation',m,28);doc.setTextColor(44,30,20);y=45;}
+function fld(l,v){cp(14);doc.setFontSize(8);doc.setTextColor(122,107,96);doc.text(l.toUpperCase(),m,y);doc.setFontSize(11);doc.setTextColor(44,30,20);doc.text(String(v||'\u2014'),m,y+5);y+=12;}
+function sec(t){cp(12);y+=4;doc.setFontSize(12);doc.setTextColor(74,55,40);doc.text(t,m,y);doc.setDrawColor(224,216,208);doc.line(m,y+2,pw-m,y+2);y+=8;}
+function sig(id,l){cp(35);doc.setFontSize(8);doc.setTextColor(122,107,96);doc.text(l,m,y);y+=3;if(signatures[id]&&signatures[id].hasContent()){try{doc.addImage(signatures[id].toDataURL(),'PNG',m,y,60,25);y+=28;}catch(e){y+=5;}}else{doc.setDrawColor(200,200,200);doc.line(m,y+10,m+60,y+10);y+=15;}}
+hdr();fld('Name',document.getElementById('llClientName').value);fld('Address',document.getElementById('llAddress').value);
+const dd=document.getElementById('llDobDay').value,dm=document.getElementById('llDobMonth').value,dy=document.getElementById('llDobYear').value;
+fld('Date of Birth',(dd&&dm&&dy)?dd+'/'+dm+'/'+dy:'\u2014');fld('Contact Number',document.getElementById('llPhone').value);
+sec('Health Conditions');const cg=document.getElementById('llConditionsGrid');const cks=cg.querySelectorAll('input[type=checkbox]');const yc=[];cks.forEach((ck,i)=>{if(ck.checked)yc.push(LL_CONDITIONS[i]);});
+if(yc.length===0){doc.setFontSize(9);doc.setTextColor(122,107,96);doc.text('None reported',m,y);y+=6;}else{yc.forEach(item=>{cp(8);doc.setFontSize(9);doc.setTextColor(184,84,80);doc.text('YES \u2014 '+item,m,y,{maxWidth:cw});y+=Math.ceil(doc.getTextDimensions(item,{maxWidth:cw}).h)+4;});}
+sec('Details & Medications');doc.setFontSize(9);doc.setTextColor(44,30,20);const det=document.getElementById('llMedDetails').value||'N/A';doc.text(det,m,y,{maxWidth:cw});y+=Math.ceil(doc.getTextDimensions(det,{maxWidth:cw}).h)+4;
+const rv=document.querySelector('input[name="llRetinol"]:checked');fld('Using Retinol',rv?rv.value:'Not answered');
+sec('Declaration');const dc=document.querySelector('input[name="llDeclaration"]');doc.setFontSize(9);doc.setTextColor(dc&&dc.checked?90:180,dc&&dc.checked?138:180,dc&&dc.checked?106:180);doc.text((dc&&dc.checked?'\u2713 ':'\u25CB ')+'Client declaration confirmed',m,y);y+=8;
+sig('sig7','Client Signature');const sd=document.getElementById('llSigDay').value,sm=document.getElementById('llSigMonth').value,sy=document.getElementById('llSigYear').value;fld('Signature Date',(sd&&sm&&sy)?sd+'/'+sm+'/'+sy:'\u2014');
+const mk=document.querySelector('input[name="llMarketing"]:checked');fld('Marketing Consent',mk?mk.value:'Not answered');
+cp(15);y+=4;doc.setFontSize(7);doc.setTextColor(160,152,136);doc.text('GDPR: Data stored securely in Ovatu. Contact no.1lashandbrowstudio@yahoo.com to opt out.',m,y,{maxWidth:cw});
+return doc;}
+
+function generatePDF(){if(typeof window.jspdf==='undefined')throw new Error('PDF library not loaded.');return currentTreatment==='lashlift'?generateLashLiftPDF():generateEyebrowPDF();}
+
+// GOOGLE DRIVE
+const SCOPES='https://www.googleapis.com/auth/drive.file';let tokenClient,gapiInited=false,gisInited=false;
+function gapiLoaded(){try{if(typeof gapi==='undefined')return;gapi.load('client',async()=>{try{const k=localStorage.getItem('gdrive_apiKey');if(k){await gapi.client.init({apiKey:k,discoveryDocs:['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']});gapiInited=true;}}catch(e){}});}catch(e){}}
+function gisLoaded(){try{if(typeof google==='undefined'||!google.accounts)return;const c=localStorage.getItem('gdrive_clientId');if(c){tokenClient=google.accounts.oauth2.initTokenClient({client_id:c,scope:SCOPES,callback:''});gisInited=true;}}catch(e){}}
+async function uploadToGDrive(blob,fn){return new Promise((res,rej)=>{if(!gapiInited||!gisInited){rej(new Error('Google Drive not configured.'));return;}tokenClient.callback=async(r)=>{if(r.error){rej(r.error);return;}try{const md={name:fn,mimeType:'application/pdf'};const fi=localStorage.getItem('gdrive_folderId');if(fi)md.parents=[fi];const f=new FormData();f.append('metadata',new Blob([JSON.stringify(md)],{type:'application/json'}));f.append('file',blob);const resp=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{'Authorization':'Bearer '+gapi.client.getToken().access_token},body:f});res(await resp.json());}catch(e){rej(e);}};if(gapi.client.getToken()===null)tokenClient.requestAccessToken({prompt:'consent'});else tokenClient.requestAccessToken({prompt:''});});}
+
+// SUBMIT
+let lastPdfBlob=null,lastPdfFilename='';
+async function submitForms(){
+  let cn=currentTreatment==='lashlift'?document.getElementById('llClientName').value.trim():document.getElementById('clientName').value.trim();
+  if(!cn){showToast('Please enter the client name.','error');goToStep(1);return;}
+  const btn=document.getElementById('btnNext');btn.disabled=true;btn.innerHTML='<div class="spinner"></div> Saving...';
+  try{
+    const doc=generatePDF();const blob=doc.output('blob');const date=new Date().toISOString().split('T')[0];
+    const sfx=currentTreatment==='lashlift'?'_KoreanLashLift_':'_Forms_';
+    const fn=cn.replace(/\s+/g,'_')+sfx+date+'.pdf';lastPdfBlob=blob;lastPdfFilename=fn;
+    const hasGD=localStorage.getItem('gdrive_clientId')&&localStorage.getItem('gdrive_apiKey');let ds=false;
+    if(hasGD){try{await uploadToGDrive(blob,fn);ds=true;}catch(e){}}
+    const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);
+    const mt=document.getElementById('modalText');const ce=localStorage.getItem('charlotte_email');const cna=localStorage.getItem('charlotte_name')||'Charlotte';const eb=document.getElementById('emailToCharlotteBtn');
+    if(ce){eb.style.display='inline-flex';eb.innerHTML='<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;margin-right:4px"><rect x="1" y="3" width="14" height="10" rx="2"/><path d="M1 3l7 5 7-5"/></svg> Email PDF to '+cna;}else{eb.style.display='none';}
+    mt.innerHTML=ds?'<strong>"'+fn+'"</strong> saved to Google Drive and downloaded.':'<strong>"'+fn+'"</strong> has been downloaded.';
+    document.getElementById('successModal').classList.add('visible');
+  }catch(e){showToast('Error: '+e.message,'error');}
+  btn.disabled=false;btn.innerHTML='<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M8 3l5 5-5 5"/></svg> Save & Submit';
+}
+
+function downloadLastPDF(){if(!lastPdfBlob){showToast('No PDF available.','error');return;}const u=URL.createObjectURL(lastPdfBlob);const a=document.createElement('a');a.href=u;a.download=lastPdfFilename;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);showToast('PDF downloaded!','success');}
+
+function emailPDFToCharlotte(){
+  const ce=localStorage.getItem('charlotte_email'),cna=localStorage.getItem('charlotte_name')||'Charlotte';
+  if(!ce){showToast('No email configured.','error');return;}
+  const cn=currentTreatment==='lashlift'?document.getElementById('llClientName').value.trim()||'Client':document.getElementById('clientName').value.trim()||'Client';
+  const d=new Date().toLocaleDateString('en-GB');const tn=currentTreatment==='lashlift'?'Korean Lash Lift':'Client';
+  const subj=encodeURIComponent(tn+' Forms \u2014 '+cn+' \u2014 '+d);
+  const body=encodeURIComponent('Hi '+cna+',\n\nPlease find attached the completed forms for '+cn+', dated '+d+'.\n\nThank you');
+  if(lastPdfBlob){const u=URL.createObjectURL(lastPdfBlob);const a=document.createElement('a');a.href=u;a.download=lastPdfFilename;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);}
+  window.location.href='mailto:'+encodeURIComponent(ce)+'?subject='+subj+'&body='+body;showToast('Opening email...','success');
+}
+
+// SETTINGS
+function showSettings(){document.getElementById('settingsPanel').classList.add('visible');}
+function hideSettings(){document.getElementById('settingsPanel').classList.remove('visible');}
+function saveSettings(){const ce=document.getElementById('charlotteEmail').value.trim();const cn=document.getElementById('charlotteName').value.trim();if(ce)localStorage.setItem('charlotte_email',ce);if(cn)localStorage.setItem('charlotte_name',cn);const ci=document.getElementById('gdriveClientId').value.trim();const ak=document.getElementById('gdriveApiKey').value.trim();const fi=document.getElementById('gdriveFolderId').value.trim();if(ci)localStorage.setItem('gdrive_clientId',ci);if(ak)localStorage.setItem('gdrive_apiKey',ak);if(fi)localStorage.setItem('gdrive_folderId',fi);if(ak)gapiLoaded();if(ci)gisLoaded();showToast('Settings saved!','success');}
+function loadSettings(){try{const D={charlotte_email:'refinebycharlotte@gmail.com',charlotte_name:'Charlotte',gdrive_clientId:'717766692319-vhfi0n8ea6b246tcc1el2kjot6e3pk2c.apps.googleusercontent.com',gdrive_apiKey:'AIzaSyAplHyfHuE_ICIkC-OdKYiCEnz02b5_Pag',gdrive_folderId:'16hLYK7bnJlBcev0pUYLxJq2jucL_on1d'};Object.entries(D).forEach(([k,v])=>{if(!localStorage.getItem(k)&&v)localStorage.setItem(k,v);});document.getElementById('charlotteEmail').value=localStorage.getItem('charlotte_email')||D.charlotte_email;document.getElementById('charlotteName').value=localStorage.getItem('charlotte_name')||D.charlotte_name;document.getElementById('gdriveClientId').value=localStorage.getItem('gdrive_clientId')||D.gdrive_clientId;document.getElementById('gdriveApiKey').value=localStorage.getItem('gdrive_apiKey')||D.gdrive_apiKey;document.getElementById('gdriveFolderId').value=localStorage.getItem('gdrive_folderId')||D.gdrive_folderId;if(localStorage.getItem('gdrive_apiKey'))gapiLoaded();if(localStorage.getItem('gdrive_clientId'))setTimeout(gisLoaded,500);}catch(e){}}
+function testGDriveConnection(){const ci=localStorage.getItem('gdrive_clientId'),ak=localStorage.getItem('gdrive_apiKey');if(!ci||!ak){showToast('Enter credentials first.','error');return;}showToast('Testing...','success');if(gisInited){tokenClient.callback=(r)=>{if(r.error)showToast('Failed: '+r.error,'error');else showToast('Connected!','success');};tokenClient.requestAccessToken({prompt:'consent'});}else showToast('GIS not loaded.','error');}
+
+// SHARE
+function showShareModal(){document.getElementById('shareModal').classList.add('visible');document.getElementById('shareLinkInput').value=window.location.href;const cn=document.getElementById('clientName').value.trim();if(cn)document.getElementById('shareClientName').value=cn;if(navigator.share)document.getElementById('nativeShareBtn').style.display='block';}
+function closeShareModal(){document.getElementById('shareModal').classList.remove('visible');}
+function switchShareTab(t){document.getElementById('tabEmail').classList.toggle('active',t==='email');document.getElementById('tabLink').classList.toggle('active',t==='link');document.getElementById('shareEmailTab').style.display=t==='email'?'block':'none';document.getElementById('shareLinkTab').style.display=t==='link'?'block':'none';}
+function sendShareEmail(){const e=document.getElementById('shareEmail').value.trim();if(!e){showToast('Enter email','error');return;}const cn=document.getElementById('shareClientName').value.trim();const cm=document.getElementById('shareMessage').value.trim();const fl=window.location.href;const g=cn?'Hi '+cn+',':'Hi,';const pn=cm?'\n\n'+cm:'';const s=encodeURIComponent('Refine by Charlotte \u2014 Client Forms');const b=encodeURIComponent(g+pn+'\n\nPlease complete your forms:\n\n'+fl+'\n\nThank you!\nCharlotte');window.location.href='mailto:'+encodeURIComponent(e)+'?subject='+s+'&body='+b;showToast('Opening email...','success');setTimeout(()=>{document.getElementById('shareEmail').value='';document.getElementById('shareClientName').value='';document.getElementById('shareMessage').value='';},1000);}
+function copyFormLink(){const l=document.getElementById('shareLinkInput').value;const b=document.getElementById('copyLinkBtn');if(navigator.clipboard){navigator.clipboard.writeText(l).then(()=>{b.textContent='Copied!';b.style.background='var(--success)';setTimeout(()=>{b.textContent='Copy';b.style.background='';},2000);}).catch(()=>fallbackCopy(l,b));}else fallbackCopy(l,b);}
+function fallbackCopy(t,b){const i=document.getElementById('shareLinkInput');i.select();i.setSelectionRange(0,99999);try{document.execCommand('copy');b.textContent='Copied!';b.style.background='var(--success)';setTimeout(()=>{b.textContent='Copy';b.style.background='';},2000);}catch(e){showToast('Copy manually','error');}}
+function nativeShare(){if(navigator.share)navigator.share({title:'Refine by Charlotte',text:'Please complete your forms.',url:window.location.href}).catch(()=>{});}
+
+// UTILITIES
+function showToast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast visible '+(type||'');setTimeout(()=>t.classList.remove('visible'),4000);}
+function closeModal(){document.getElementById('successModal').classList.remove('visible');}
+function resetAll(){if(!confirm('Start a new client? This will clear all form data.'))return;document.querySelectorAll('.field-input').forEach(el=>{if(el.type==='date')el.value=new Date().toISOString().split('T')[0];else if(el.tagName==='SELECT')el.selectedIndex=0;else el.value='';});document.querySelectorAll('.toggle-item').forEach(el=>{el.classList.remove('yes');el.querySelector('input').checked=false;});document.querySelectorAll('.consent-item').forEach(el=>{el.classList.remove('checked');el.querySelector('input').checked=false;});document.querySelectorAll('.radio-option').forEach(el=>{el.classList.remove('selected');el.querySelector('input').checked=false;});Object.values(signatures).forEach(s=>s.clear());populateDateSelects('llSig',true);backToSelector();showToast('Form cleared','success');}
+
+</script>
+
+
+<!-- Failsafe: always show app after 3 seconds no matter what -->
+<script>
+setTimeout(function() {
+  var splash = document.getElementById('splash');
+  var app = document.getElementById('app');
+  if (splash && splash.style.display !== 'none') {
+    splash.style.display = 'none';
+  }
+  if (app && !app.classList.contains('visible')) {
+    app.classList.add('visible');
+  }
+}, 3000);
+</script>
+</body>
+</html>
