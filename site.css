@@ -5,3 +5,33 @@
 header .nav-cta{background:var(--cream);color:var(--dark);border-color:var(--cream);font-weight:600}header .nav-cta:hover{background:var(--white);border-color:var(--white)}
 
 .gallery-grid{align-items:start}.gallery-item img{width:100%;height:auto;aspect-ratio:3 / 4;object-fit:cover;object-position:center}
+
+.instagram-section{padding:3rem 5%;max-width:1280px;margin:auto;text-align:center}.instagram-section .sk-instagram-feed{margin-top:1.5rem;min-width:0;max-width:100%}
+
+.gallery-grid{max-width:960px}.gallery-item img{aspect-ratio:auto;object-fit:contain;height:auto}.gallery-item span{min-height:3rem}@media(max-width:600px){.gallery-grid{grid-template-columns:1fr;gap:2rem}}
+
+.results-video{max-width:440px;margin:2.5rem auto 0}.results-video video{display:block;width:100%;height:auto;max-height:75vh;margin:auto;background:#321912}
+
+.results-video{width:min(100%,440px)}.results-video video{width:100%;height:auto;max-height:none;aspect-ratio:9 / 11;background:transparent}
+
+.experience-photos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.5rem;max-width:850px;margin:0 auto 3rem;align-items:start}.experience-photos img{display:block;width:100%;height:auto;border:0;transform:none}@media(max-width:600px){.experience-photos{grid-template-columns:1fr;max-width:440px;gap:1.5rem}}
+
+.experience-photos img{aspect-ratio:1086 / 1448;object-fit:cover}.experience-photos img:nth-child(2){object-position:center bottom}
+
+.results-video{width:min(100%,360px)}.results-video video{aspect-ratio:9 / 16;height:auto;object-fit:contain}
+
+.hero-photos figure{margin:0;min-width:0;background:var(--white);padding-bottom:.7rem}.hero-photos figure:first-child{transform:rotate(-3deg);margin-top:3rem}.hero-photos figure:last-child{transform:rotate(3deg);margin-bottom:3rem}.hero-photos figure img{transform:none;margin:0}.hero-photos figcaption{text-align:center;color:var(--dark);font-size:.875rem;font-weight:600;line-height:1.4;padding:.2rem .4rem}
+.hero-photos figure img:first-child,.hero-photos figure img:last-child{transform:none;margin:0}
+
+/* Arial Nova typography */
+body{font-family:"Arial Nova",Arial,sans-serif}h1,h2,h3,.brand-line{font-family:"Arial Nova",Arial,sans-serif}button,input,select,textarea{font-family:inherit}
+
+.hero h1{font-family:"Times New Roman Condensed","Times New Roman",Times,serif;font-stretch:condensed}
+
+.hero-photos figcaption{font-family:"Arial Nova",Arial,sans-serif}
+
+.hero-after-crop{height:385px;overflow:hidden;border:7px solid var(--white);position:relative}.hero-photos .hero-after-crop img:first-child{position:absolute;bottom:0;left:0;width:100%;height:200%;max-width:none;border:0;object-fit:cover;object-position:center bottom}@media(max-width:760px){.hero-after-crop{height:250px}}
+
+.hero-photos .hero-after-crop img:first-child{width:auto;height:260%;left:-40%;bottom:-8%;object-fit:initial;object-position:initial}
+
+.hero-photos figure img.hero-full-brow{object-fit:contain;object-position:center;background:var(--white)}
