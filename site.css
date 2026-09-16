@@ -35,3 +35,45 @@ body{font-family:"Arial Nova",Arial,sans-serif}h1,h2,h3,.brand-line{font-family:
 .hero-photos .hero-after-crop img:first-child{width:auto;height:260%;left:-40%;bottom:-8%;object-fit:initial;object-position:initial}
 
 .hero-photos figure img.hero-full-brow{object-fit:contain;object-position:center;background:var(--white)}
+
+@media(max-width:760px){.hero{display:flex;flex-direction:column;align-items:stretch}.hero-copy{display:contents}.hero-copy>*{order:2}.hero-copy>.eyebrow,.hero-copy>.brand-line{order:0}.hero>.hero-photos{order:1;margin:0 0 2rem;width:100%}}
+
+h1,h2,h3,h4,h5,h6,.hero h1{font-family:"Times New Roman MT Condensed","Times New Roman",Times,serif;font-stretch:condensed}
+
+@media(max-width:760px){.hero{row-gap:0}.hero-copy>.eyebrow{margin-bottom:.35rem}.hero-copy>.brand-line{margin-top:0;margin-bottom:1rem}}
+
+.treatments-heading{text-align:left}.treatments-heading h2{font-family:"Times New Roman",Times,serif;font-style:normal;font-stretch:normal}
+
+#results h2{font-family:"Times New Roman",Times,serif;font-style:normal;font-stretch:normal}
+
+h1,h2,h3,h4,h5,h6,.hero h1,.treatments-heading h2,#results h2{font-family:"Times New Roman",Times,serif;font-style:normal;font-stretch:normal}
+
+.hero-photos figure img,.hero-photos figure img.hero-full-brow{width:100%;height:auto;aspect-ratio:3 / 4;object-fit:cover;object-position:center}.hero-photos figcaption{min-height:2.4rem;display:flex;align-items:center;justify-content:center}
+
+/* Tighter spacing between page sections */
+.section-heading{margin-top:2.5rem;margin-bottom:1.5rem}
+.services{padding-bottom:1.5rem}
+.gallery,.stylist,.experience,.reviews,.contact,.instagram-section{padding-top:2.5rem;padding-bottom:2.5rem}
+.faq-text{margin-bottom:1.5rem}
+.reviews>h2{margin-bottom:1.5rem}
+.experience-photos{margin-bottom:2rem}
+@media(max-width:760px){
+.hero{padding-top:1.5rem;padding-bottom:1.5rem}
+.hero>.hero-photos{margin-bottom:1.25rem}
+.section-heading{margin-top:1.75rem;margin-bottom:1rem}
+.services{padding-bottom:.75rem}
+.gallery,.stylist,.experience,.reviews,.contact,.instagram-section{padding-top:1.75rem;padding-bottom:1.75rem}
+.gallery-sub{margin-bottom:1rem}
+.faq-text{margin-bottom:1rem}
+.reviews>h2,.experience-photos{margin-bottom:1.25rem}
+.experience-steps{margin-top:1.5rem}
+.results-video{margin-top:1.5rem}
+}
+
+@media(max-width:760px){header nav{display:grid;grid-template-columns:repeat(5,auto);column-gap:.8rem;row-gap:.7rem;justify-content:center;width:100%;align-items:center}header nav>a:not(.nav-cta){font-size:.82rem;min-height:44px;display:flex;align-items:center;justify-content:center}header .nav-cta{grid-column:1/-1;justify-self:center}}
+
+.hero-photos figcaption{font-weight:400}
+
+.footer-logo{width:125px;height:auto;margin:0 auto 1rem}.hero-photos img[src*="hairstroke-brows-hero"]{filter:sepia(.24) saturate(1.25)}
+
+.ombre-results-trim{overflow:hidden}.ombre-results-trim img{width:calc(100% + 3px);max-width:none;margin-left:-3px;margin-top:-3px}
