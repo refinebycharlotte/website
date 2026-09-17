@@ -80,3 +80,22 @@ h1,h2,h3,h4,h5,h6,.hero h1,.treatments-heading h2,#results h2{font-family:"Times
 
 /* Reserve the result image space before decoding on mobile browsers. */
 .ombre-results-trim{position:relative;aspect-ratio:4 / 5;width:100%}.ombre-results-trim img{position:absolute;top:-3px;left:-3px;width:calc(100% + 3px);height:calc(100% + 3px);margin:0;object-fit:cover}
+
+/* Consistent headings and body copy; straight, unframed hero photo. */
+body{font-family:"Arial Nova",Arial,sans-serif;font-size:1rem;color:var(--dark);text-align:left}
+h1,h2,h3,h4,h5,h6,.hero h1,.mval h3,.rev h3,.faq-heading{font-family:"Times New Roman",Times,serif;font-size:clamp(2rem,3.7vw,3.5rem);font-weight:400;font-style:normal;line-height:1.15;letter-spacing:normal;text-align:left}
+p,.intro,.brand-line,.svc p,.rev p,.small,.price-note,.gallery-sub{font-family:"Arial Nova",Arial,sans-serif;font-size:1rem;font-weight:400;font-style:normal;line-height:1.7;color:inherit;text-align:left}
+.section-heading,.gallery,.reviews>h2,.experience-text>h2,.experience-text>.desc,.instagram-section,footer{text-align:left}
+.experience-text>h2,.experience-text>.desc{max-width:none;margin-left:0;margin-right:0}
+footer nav{justify-content:flex-start}.footer-logo{margin-left:0;margin-right:0}
+.button,.whatsapp-button{justify-content:flex-start;text-align:left}
+.hero-single{display:block;max-width:540px;padding:0}
+.hero-photos.hero-single img:first-child,.hero-photos.hero-single img:last-child{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:contain;transform:none;margin:0;border:0;filter:none}
+@media(max-width:760px){.hero>.hero-single{margin-left:0;margin-right:0;max-width:500px}.faq-heading{font-size:2rem}}
+
+.hero-single{overflow:hidden}.hero-photos.hero-single img:first-child,.hero-photos.hero-single img:last-child{clip-path:inset(3px 0 0 0);margin-top:-3px}
+
+/* Restore compact questions and centred footer. */
+.faq-heading{font-size:1.3rem}footer,footer p{text-align:center}footer nav{justify-content:center}.footer-logo{margin-left:auto;margin-right:auto}
+
+footer p.small{width:100%;text-align:center;margin-left:auto;margin-right:auto}
