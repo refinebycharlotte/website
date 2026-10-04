@@ -99,3 +99,5 @@ footer nav{justify-content:flex-start}.footer-logo{margin-left:0;margin-right:0}
 .faq-heading{font-size:1.3rem}footer,footer p{text-align:center}footer nav{justify-content:center}.footer-logo{margin-left:auto;margin-right:auto}
 
 footer p.small{width:100%;text-align:center;margin-left:auto;margin-right:auto}
+
+.mobile-cta{display:none}@media(max-width:800px){.mobile-cta{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;position:fixed;left:0;right:0;bottom:0;z-index:50;padding:.6rem .75rem calc(.6rem + env(safe-area-inset-bottom));background:var(--cream);border-top:1px solid var(--line);box-shadow:0 -4px 14px rgba(50,25,18,.12);transition:transform .25s ease}.mobile-cta.is-hidden{transform:translateY(110%)}.mobile-cta a{display:flex;align-items:center;justify-content:center;gap:.45rem;min-height:48px;font-weight:700;text-decoration:none;border-radius:5px;font-size:1rem}.mobile-cta-wa{background:#25d366;color:#073b20;border:1px solid #159447}.mobile-cta-wa svg{width:20px;height:20px;flex:0 0 20px}.mobile-cta-consult{background:var(--dark);color:var(--cream);border:1px solid var(--dark)}body{padding-bottom:calc(72px + env(safe-area-inset-bottom))}}

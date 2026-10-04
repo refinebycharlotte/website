@@ -35,6 +35,9 @@ form?.addEventListener('submit',async event=>{
     clearTimeout(timeout);button.disabled=enquirySent;button.textContent=enquirySent?'Enquiry sent':'Request my consultation';status.focus();
   }
 });
-document.getElementById('waBtn')?.addEventListener('click',()=>{
+document.querySelectorAll('#waBtn, .mobile-cta-wa').forEach(link=>link.addEventListener('click',()=>{
   if(typeof window.gtag==='function')window.gtag('event','conversion',{send_to:'AW-18320579867/BjUDCJul4M8cEJu6959E'});
-});
+}));
+
+// Hide the quick-contact bar while the contact section is on screen so it never covers the form.
+(()=>{const bar=document.querySelector('.mobile-cta'),contact=document.getElementById('contact');if(!bar||!contact||!('IntersectionObserver' in window))return;new IntersectionObserver(([e])=>bar.classList.toggle('is-hidden',e.isIntersecting),{rootMargin:'0px 0px -20% 0px'}).observe(contact);})();
