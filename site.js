@@ -28,6 +28,7 @@ form?.addEventListener('submit',async event=>{
     // Tracking failure must never turn an accepted enquiry into a send error.
     try{
       if(typeof window.gtag==='function')window.gtag('event','conversion',{send_to:'AW-18320579867/jAeLCJil4M8cEJu6959E'});
+      if(window.uetq)window.uetq.push('event','form_submit',{});
     }catch(trackingError){}
   }catch(error){
     status.textContent=error.name==='AbortError'?'We could not confirm delivery. Please contact Charlotte on WhatsApp before sending again.':'Your enquiry could not be sent. Your details are still here; please try again or message Charlotte on WhatsApp.';
@@ -37,6 +38,7 @@ form?.addEventListener('submit',async event=>{
 });
 document.querySelectorAll('#waBtn, .mobile-cta-wa').forEach(link=>link.addEventListener('click',()=>{
   if(typeof window.gtag==='function')window.gtag('event','conversion',{send_to:'AW-18320579867/BjUDCJul4M8cEJu6959E'});
+  if(window.uetq)window.uetq.push('event','whatsapp_click',{});
 }));
 
 // Hide the quick-contact bar while the contact section is on screen so it never covers the form.
